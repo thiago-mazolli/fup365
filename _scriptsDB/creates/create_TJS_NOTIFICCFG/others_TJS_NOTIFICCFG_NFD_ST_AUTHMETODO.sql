@@ -1,0 +1,1 @@
+comment on column TJS_NOTIFICCFG.NFD_ST_AUTHMETODO is 'Método - POST; PUT; GET; DELETE'

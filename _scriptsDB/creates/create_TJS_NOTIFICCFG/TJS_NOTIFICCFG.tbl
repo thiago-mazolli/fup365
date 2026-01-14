@@ -1,0 +1,9 @@
+create table
+  TJS_NOTIFICCFG (
+    NFD_ST_WEBHOOKMETODO varchar2(10) not null,
+    NFD_ST_WEBHOOKHOST varchar2(255) not null,
+    NFD_ST_AUTHKEY varchar2(4000),
+    NFD_ST_AUTHMETODO varchar2(10),
+    NFD_ST_AUTHHOST varchar2(255),
+    NFD_ST_AUTHPATH varchar2(255)
+  )

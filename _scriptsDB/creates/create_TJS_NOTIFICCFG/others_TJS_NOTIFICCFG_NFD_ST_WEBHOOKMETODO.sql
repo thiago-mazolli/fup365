@@ -1,0 +1,1 @@
+comment on column TJS_NOTIFICCFG.NFD_ST_WEBHOOKMETODO is 'Método - POST; PUT; GET; DELETE'

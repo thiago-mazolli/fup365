@@ -1,0 +1,1 @@
+comment on column TJS_INTEGRACAOCFG.CFG_ST_AUTHMETODO is 'Método - POST; PUT; GET; DELETE'

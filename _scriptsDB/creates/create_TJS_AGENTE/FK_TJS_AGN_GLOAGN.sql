@@ -1,0 +1,3 @@
+alter table TJS_AGENTE
+add constraint FK_TJS_AGN_GLOAGN foreign key (AGN_TAB_IN_CODIGO, AGN_PAD_IN_CODIGO, AGN_IN_CODIGO)
+references GLO_AGENTES (AGN_TAB_IN_CODIGO, AGN_PAD_IN_CODIGO, AGN_IN_CODIGO) on delete cascade

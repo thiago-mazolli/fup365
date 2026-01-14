@@ -1,0 +1,9 @@
+{
+  "sourceMap": true,
+  "parserOpts": { "allowReturnOutsideFunction": true, "allowOctalLiteralInStrictMode": true },
+  "presets": ["es2015", "stage-0"],
+  "plugins": [
+    // "babel-plugin-istanbul",
+    "babel-plugin-transform-object-rest-spread"
+  ]
+}

@@ -1,0 +1,7 @@
+create table
+  TJS_AGENTE (
+    AGN_TAB_IN_CODIGO number(3) not null,
+    AGN_PAD_IN_CODIGO number(3) not null,
+    AGN_IN_CODIGO number(7) not null,
+    AGN_CH_INTEGRAME char(1) not null
+  )
