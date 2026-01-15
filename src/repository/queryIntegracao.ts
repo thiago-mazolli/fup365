@@ -1,40 +1,24 @@
-export const buscaIntegracaoPendenteSDB = (findOne: boolean) => `
-  select
-    nfd.NFD_ST_TBLMEGA as "tblMega",
-    nfd.NFD_ST_PKMEGA as "pkMega",
-    nfd.NFD_DT_DATAMOD as "dataModificacao",
-    nfd.NFD_DT_DATAENV as "dataEnvio"
-  from
-    TJS_INTEGRACAOMOD nfd
-  where
-    nvl(nfd.NFD_DT_DATAMOD, sysdate) > nvl(nfd.NFD_DT_DATAENV, sysdate)
-    and nfd.NFD_ST_TBLMEGA = :pNFD_ST_TBLMEGA
-    and nvl(nfd.NFD_DT_DATAMOD, sysdate) < (sysdate - INTERVAL '2' MINUTE)
-  order by
-    nfd.NFD_DT_DATAMOD
-`;
-
-export const updateDataEnvIntegracaoPRC = `
+export const updateDataEnvioPRC = `
   begin
     update
       TJS_INTEGRACAOMOD
     set
-      NFD_DT_DATAENV = sysdate
-    where NFD_ST_TBLMEGA = :pNFD_ST_TBLMEGA
-      and NFD_ST_PKMEGA = :pNFD_ST_PKMEGA
-      and NFD_ST_WEBHOOKHOST = :pNFD_ST_WEBHOOKHOST
+      MOD_DT_DATAENV = sysdate
+    where MOD_ST_TBLMEGA = :pMOD_ST_TBLMEGA
+      and MOD_ST_PKMEGA = :pMOD_ST_PKMEGA
+      and MOD_ST_WEBHOOKHOST = :pMOD_ST_WEBHOOKHOST
     ;
   end;
 `;
 
-export const gravaLogIntegracaoPRC = `
+export const gravaLogEnvioPRC = `
   begin
     merge into
       TJS_INTEGRACAOLOG tgt using (
         select
-          :pNFD_ST_TBLMEGA as NFD_ST_TBLMEGA,
-          :pNFD_ST_PKMEGA as NFD_ST_PKMEGA,
-          :pNFD_ST_WEBHOOKHOST as NFD_ST_WEBHOOKHOST,
+          :pMOD_ST_TBLMEGA as MOD_ST_TBLMEGA,
+          :pMOD_ST_PKMEGA as MOD_ST_PKMEGA,
+          :pMOD_ST_WEBHOOKHOST as MOD_ST_WEBHOOKHOST,
           :pLOG_CH_STATUS as LOG_CH_STATUS,
           :pLOG_ST_MSG as LOG_ST_MSG,
           :pLOG_CL_REQUEST as LOG_CL_REQUEST,
@@ -42,9 +26,9 @@ export const gravaLogIntegracaoPRC = `
         from
           dual
       ) src on (
-        tgt.NFD_ST_TBLMEGA = src.NFD_ST_TBLMEGA
-        and tgt.NFD_ST_PKMEGA = src.NFD_ST_PKMEGA
-        and tgt.NFD_ST_WEBHOOKHOST = src.NFD_ST_WEBHOOKHOST
+        tgt.MOD_ST_TBLMEGA = src.MOD_ST_TBLMEGA
+        and tgt.MOD_ST_PKMEGA = src.MOD_ST_PKMEGA
+        and tgt.MOD_ST_WEBHOOKHOST = src.MOD_ST_WEBHOOKHOST
       )
     when matched then
     update set
@@ -57,9 +41,9 @@ export const gravaLogIntegracaoPRC = `
     insert
       (
         LOG_DT_DATA,
-        NFD_ST_TBLMEGA,
-        NFD_ST_PKMEGA,
-        NFD_ST_WEBHOOKHOST,
+        MOD_ST_TBLMEGA,
+        MOD_ST_PKMEGA,
+        MOD_ST_WEBHOOKHOST,
         LOG_CH_STATUS,
         LOG_ST_MSG,
         LOG_CL_REQUEST,
@@ -68,9 +52,9 @@ export const gravaLogIntegracaoPRC = `
     values
       (
         sysdate,
-        src.NFD_ST_TBLMEGA,
-        src.NFD_ST_PKMEGA,
-        src.NFD_ST_WEBHOOKHOST,
+        src.MOD_ST_TBLMEGA,
+        src.MOD_ST_PKMEGA,
+        src.MOD_ST_WEBHOOKHOST,
         src.LOG_CH_STATUS,
         src.LOG_ST_MSG,
         src.LOG_CL_REQUEST,
@@ -78,4 +62,13 @@ export const gravaLogIntegracaoPRC = `
       )
     ;
   end;
+`;
+
+export const validaEnvioSBD = `
+  select
+    1
+  from TJS_INTEGRACAOMOD mod
+  where nvl(mod.NFD_DT_DATAMOD, sysdate) > nvl(mod.NFD_DT_DATAENV, sysdate)
+    and mod.NFD_ST_TBLMEGA = :pNFD_ST_TBLMEGA
+    and mod.NFD_ST_PKMEGA = :pNFD_ST_PKMEGA
 `;

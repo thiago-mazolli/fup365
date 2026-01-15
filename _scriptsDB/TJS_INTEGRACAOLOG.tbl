@@ -1,8 +1,8 @@
 create table
   TJS_INTEGRACAOLOG (
     LOG_DT_DATA date not null,
-    NFD_ST_TBLMEGA varchar2(100) not null,
-    NFD_ST_PKMEGA varchar2(100) not null,
+    MOD_ST_TBLMEGA varchar2(100) not null,
+    MOD_ST_PKMEGA varchar2(100) not null,
     LOG_CH_STATUS char(1) not null,
     LOG_ST_MSG varchar2(255),
     LOG_CL_REQUEST clob,
@@ -11,5 +11,5 @@ create table
 ;
 
 alter table TJS_INTEGRACAOLOG
-add constraint PK_TJS_INTEGRACAOLOG primary key (LOG_DT_DATA, NFD_ST_TBLMEGA, NFD_ST_PKMEGA)
+add constraint PK_TJS_INTEGRACAOLOG primary key (LOG_DT_DATA, MOD_ST_TBLMEGA, MOD_ST_PKMEGA)
 ;

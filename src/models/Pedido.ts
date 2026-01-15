@@ -1,83 +1,76 @@
-import connectionAttributes, { libDir, disableLogs } from '../config/database';
-import {
-  buscaContasPagarSDB,
-  buscaRecebimentosSDB,
-  cancelaPedidoPRC,
-} from '../repository/queryPedido';
-import IPedidoReceb from '../interfaces/IPedidoReceb';
-import IPedidoAP from '../interfaces/IPedidoAP';
 import dateDBToDateJSON from '../helpers/dateDBToDateJSON';
+import connectionAttributes, { disableLogs, libDir } from '../config/database';
 import executaScript from '../helpers/executaScript';
+import {
+  buscaPedidosSDB,
+  buscaPedidosCanceladosSDB,
+  buscaRecebimentosSDB,
+} from '../repository/queryPedido';
 
-export default class Pedido {
-  static async cancelaPedido(pkMega: string) {
-    await executaScript({
+export default class Integracao {
+  static async buscaPedidos(): Promise<[]> {
+    const data = await executaScript({
       connectionAttributes,
       libDir,
       disableLogs,
-      execSQL: true,
-      script: cancelaPedidoPRC,
+      script: buscaPedidosSDB,
       params: {
-        pORG_TAB_IN_CODIGO: pkMega.split(';')[0],
-        pORG_PAD_IN_CODIGO: pkMega.split(';')[1],
-        pORG_IN_CODIGO: pkMega.split(';')[2],
-        pORG_TAU_ST_CODIGO: pkMega.split(';')[3],
-        pSER_TAB_IN_CODIGO: pkMega.split(';')[4],
-        pSER_IN_SEQUENCIA: pkMega.split(';')[5],
-        pPDC_IN_CODIGO: pkMega.split(';')[6],
+        // pMOD_ST_TBLMEGA: tblMega,
       },
     });
 
-    return { message: 'Pedido cancelado com sucesso' };
+    return data.map((d: any) => ({
+      tblMega: d.MOD_ST_TBLMEGA,
+      pkMega: d.MOD_ST_PKMEGA,
+      registro: {
+        ...d,
+        dataModificacao: dateDBToDateJSON(d.dataModificacao),
+        dataEnvio: dateDBToDateJSON(d.dataEnvio),
+      },
+    }));
   }
 
-  static async buscaRecebimentos(
-    dataInicial?: string,
-    dataFinal?: string
-  ): Promise<IPedidoReceb[]> {
-    const data = await (<Promise<IPedidoReceb[]>>executaScript({
+  static async buscaPedidosCancelados(): Promise<[]> {
+    const data = await executaScript({
+      connectionAttributes,
+      libDir,
+      disableLogs,
+      script: buscaPedidosCanceladosSDB,
+      params: {
+        // pMOD_ST_TBLMEGA: tblMega,
+      },
+    });
+
+    return data.map((d: any) => ({
+      tblMega: d.MOD_ST_TBLMEGA,
+      pkMega: d.MOD_ST_PKMEGA,
+      registro: {
+        ...d,
+        dataModificacao: dateDBToDateJSON(d.dataModificacao),
+        dataEnvio: dateDBToDateJSON(d.dataEnvio),
+      },
+    }));
+  }
+
+  static async buscaRecebimentos(): Promise<[]> {
+    const data = await executaScript({
       connectionAttributes,
       libDir,
       disableLogs,
       script: buscaRecebimentosSDB,
       params: {
-        pDATAINI: dataInicial || null,
-        pDATAFIM: dataFinal || null,
+        // pMOD_ST_TBLMEGA: tblMega,
       },
-    }));
+    });
 
-    return data.map(d => ({
-      ...d,
-      itens: d.itens.map(i => ({
-        ...i,
-        dataRecebimento: dateDBToDateJSON(i.dataRecebimento),
-      })),
-    }));
-  }
-
-  static async buscaContasPagar(
-    dataInicial?: string,
-    dataFinal?: string
-  ): Promise<IPedidoAP[]> {
-    const data = await (<Promise<IPedidoAP[]>>executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
-      script: buscaContasPagarSDB,
-      params: {
-        pDATAINI: dataInicial || null,
-        pDATAFIM: dataFinal || null,
+    return data.map((d: any) => ({
+      tblMega: d.MOD_ST_TBLMEGA,
+      pkMega: d.MOD_ST_PKMEGA,
+      registro: {
+        ...d,
+        dataModificacao: dateDBToDateJSON(d.dataModificacao),
+        dataEnvio: dateDBToDateJSON(d.dataEnvio),
       },
-    }));
-
-    return data.map(d => ({
-      ...d,
-      parcelas: d.parcelas.map(p => ({
-        ...p,
-        dataVencimento: dateDBToDateJSON(p.dataVencimento),
-        dataVencProrrogado: dateDBToDateJSON(p.dataVencProrrogado),
-        dataPagamento: dateDBToDateJSON(p.dataPagamento),
-      })),
     }));
   }
 }

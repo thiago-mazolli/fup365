@@ -77,25 +77,25 @@ export default class IntegracaoController {
   }
 
   static async postOrdersItems(_: Request, res: Response) {
-    const registros = await Integracao.buscaIntegracaoPedidos();
+    const registros = await Integracao.buscaPedidos();
 
     const resp = await IntegracaoController.integraDados('I', registros);
 
     return res.status(200).send(resp);
   }
 
-  static async postOrdersReceived(_: Request, res: Response) {
-    const registros = await Integracao.buscaIntegracaoRecebimento();
+  static async postOrdersCanceled(_: Request, res: Response) {
+    const registros = await Integracao.buscaPedidosCancelados();
 
-    const resp = await IntegracaoController.integraDados('R', registros);
+    const resp = await IntegracaoController.integraDados('C', registros);
 
     return res.status(200).send(resp);
   }
 
-  static async postOrdersCanceled(_: Request, res: Response) {
-    const registros = await Integracao.buscaIntegracaoCancelamentos();
+  static async postOrdersReceived(_: Request, res: Response) {
+    const registros = await Integracao.buscaRecebimentos();
 
-    const resp = await IntegracaoController.integraDados('C', registros);
+    const resp = await IntegracaoController.integraDados('R', registros);
 
     return res.status(200).send(resp);
   }

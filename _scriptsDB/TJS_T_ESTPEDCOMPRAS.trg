@@ -2,7 +2,7 @@ create or replace trigger TJS_T_ESTPEDCOMPRAS
   after insert or update or delete on EST_PEDCOMPRAS
   for each row
 declare
-  vNFD_ST_TBLMEGA TJS_INTEGRACAOMOD.NFD_ST_TBLMEGA%type;
+  vMOD_ST_TBLMEGA TJS_INTEGRACAOMOD.MOD_ST_TBLMEGA%type;
 begin
   begin
     select decode(count(1), 0, 0, 1)
@@ -19,13 +19,13 @@ begin
 
   if vINTEGRAFUP = 1 then
     if ((DELETING) or (:new.PDC_ST_SITUACAO in ('PC', 'PR', 'PE'))) then
-      vNFD_ST_TBLMEGA := 'EST_PEDCOMPRAS_CANC';
+      vMOD_ST_TBLMEGA := 'EST_PEDCOMPRAS_CANC';
     else
-      vNFD_ST_TBLMEGA := 'EST_PEDCOMPRAS';
+      vMOD_ST_TBLMEGA := 'EST_PEDCOMPRAS';
     end if;
 
     TJS_PCK_INTEGRACAO.P_CRIA_INTEGRACAO(
-      vNFD_ST_TBLMEGA,
+      vMOD_ST_TBLMEGA,
       (
         nvl(:old.ORG_TAB_IN_CODIGO, :new.ORG_TAB_IN_CODIGO) || ';' ||
         nvl(:old.ORG_PAD_IN_CODIGO, :new.ORG_PAD_IN_CODIGO) || ';' ||
