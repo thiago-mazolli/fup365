@@ -9,6 +9,8 @@ import processListener from './middlewares/processListener';
 import setTimeOutRequest from './middlewares/setTimeOutRequest';
 import logErrors from './middlewares/logErrors';
 
+import initJobs from './jobs';
+
 class App {
   server: Express;
 
@@ -17,6 +19,8 @@ class App {
     this.middlewares();
     this.routes();
     this.errors();
+
+    initJobs();
   }
 
   middlewares() {
