@@ -12,7 +12,7 @@
     "clear-dist": "if exist dist\\ rmdir /s /q .\\dist",
     "build-main": "tsup ./src/server.ts",
     "build": "yarn && yarn clear-dist && yarn build-main",
-    "build-prod": "yarn doc && yarn clear-dist && yarn build-main && yarn --production",
+    "build-prod": "yarn clear-dist && yarn build-main && yarn --production",
     "package3": "npx pkg . && yarn",
     "package2": "xcopy \"./node_modules\" \"dist/node_modules\" /E /I /Y",
     "package1": "yarn build-prod",
@@ -27,7 +27,6 @@
     "@types/node": "^20.19.9",
     "@types/node-cron": "^3.0.11",
     "@types/oracledb": "^5.1.0",
-    "@types/swagger-ui-express": "^4.1.6",
     "@typescript-eslint/eslint-plugin": "4.0.1",
     "@typescript-eslint/parser": "4.0.1",
     "eslint": "7.32.0",
@@ -54,9 +53,7 @@
     "jsonwebtoken": "^9.0.0",
     "node-cron": "^3.0.0",
     "oracledb": "^5.1.0",
-    "selective-whitespace": "^1.0.4",
-    "swagger-autogen": "^2.23.7",
-    "swagger-ui-express": "^5.0.1"
+    "selective-whitespace": "^1.0.4"
   },
   "pkg": {
     "scripts": [

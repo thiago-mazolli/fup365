@@ -1,45 +1,40 @@
 export const buscaIntegracaoPendenteSDB = (findOne: boolean) => `
   select
-    mod.NFD_ST_TBLMEGA,
-    mod.NFD_ST_PKMEGA,
-    mod.NFD_DT_DATAMOD,
-    mod.NFD_DT_DATAENV,
-    mod.NFD_ST_METODO,
-    mod.CFG_ST_HOST,
-    mod.NFD_ST_PATH,
-    mod.CFG_ST_AUTHKEY,
-    mod.CFG_ST_AUTHMETODO,
-    mod.CFG_ST_AUTHHOST,
-    mod.CFG_ST_AUTHPATH,
-    mod.NFD_ST_IDME
-  from TJS_INTEGRACAOMOD mod
-  where nvl(mod.NFD_DT_DATAMOD, sysdate) > nvl(mod.NFD_DT_DATAENV, sysdate)
-     ${findOne ? 'and mod.NFD_ST_TBLMEGA = :pNFD_ST_TBLMEGA' : ''}
-     ${findOne ? 'and mod.NFD_ST_PKMEGA = :pNFD_ST_PKMEGA' : ''}
+    nfd.NFD_ST_TBLMEGA as "tblMega",
+    nfd.NFD_ST_PKMEGA as "pkMega",
+    nfd.NFD_DT_DATAMOD as "dataModificacao",
+    nfd.NFD_DT_DATAENV as "dataEnvio"
+  from
+    TJS_INTEGRACAOMOD nfd
+  where
+    nvl(nfd.NFD_DT_DATAMOD, sysdate) > nvl(nfd.NFD_DT_DATAENV, sysdate)
+    and nfd.NFD_ST_TBLMEGA = :pNFD_ST_TBLMEGA
+    and nvl(nfd.NFD_DT_DATAMOD, sysdate) < (sysdate - INTERVAL '2' MINUTE)
   order by
-    mod.NFD_DT_DATAMOD
+    nfd.NFD_DT_DATAMOD
 `;
 
-export const updateDataEnvioPRC = `
+export const updateDataEnvIntegracaoPRC = `
   begin
     update
       TJS_INTEGRACAOMOD
     set
-      NFD_DT_DATAENV = sysdate,
-      NFD_ST_IDME = nvl(:pNFD_ST_IDME, NFD_ST_IDME)
+      NFD_DT_DATAENV = sysdate
     where NFD_ST_TBLMEGA = :pNFD_ST_TBLMEGA
       and NFD_ST_PKMEGA = :pNFD_ST_PKMEGA
+      and NFD_ST_WEBHOOKHOST = :pNFD_ST_WEBHOOKHOST
     ;
   end;
 `;
 
-export const gravaLogEnvioPRC = `
+export const gravaLogIntegracaoPRC = `
   begin
     merge into
       TJS_INTEGRACAOLOG tgt using (
         select
           :pNFD_ST_TBLMEGA as NFD_ST_TBLMEGA,
           :pNFD_ST_PKMEGA as NFD_ST_PKMEGA,
+          :pNFD_ST_WEBHOOKHOST as NFD_ST_WEBHOOKHOST,
           :pLOG_CH_STATUS as LOG_CH_STATUS,
           :pLOG_ST_MSG as LOG_ST_MSG,
           :pLOG_CL_REQUEST as LOG_CL_REQUEST,
@@ -49,7 +44,7 @@ export const gravaLogEnvioPRC = `
       ) src on (
         tgt.NFD_ST_TBLMEGA = src.NFD_ST_TBLMEGA
         and tgt.NFD_ST_PKMEGA = src.NFD_ST_PKMEGA
-        and 1 = 0 --PARA SEMPRE CAIR NO INSERT
+        and tgt.NFD_ST_WEBHOOKHOST = src.NFD_ST_WEBHOOKHOST
       )
     when matched then
     update set
@@ -64,6 +59,7 @@ export const gravaLogEnvioPRC = `
         LOG_DT_DATA,
         NFD_ST_TBLMEGA,
         NFD_ST_PKMEGA,
+        NFD_ST_WEBHOOKHOST,
         LOG_CH_STATUS,
         LOG_ST_MSG,
         LOG_CL_REQUEST,
@@ -74,6 +70,7 @@ export const gravaLogEnvioPRC = `
         sysdate,
         src.NFD_ST_TBLMEGA,
         src.NFD_ST_PKMEGA,
+        src.NFD_ST_WEBHOOKHOST,
         src.LOG_CH_STATUS,
         src.LOG_ST_MSG,
         src.LOG_CL_REQUEST,
