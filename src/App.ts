@@ -4,7 +4,6 @@ import express, { Express } from 'express';
 import cors from 'cors';
 
 import privateRoutes from './routes';
-import swaggerRoutes from './swagger/routes';
 import gravaLogErros from './middlewares/gravaLogErros';
 import processListener from './middlewares/processListener';
 import setTimeOutRequest from './middlewares/setTimeOutRequest';
@@ -45,7 +44,6 @@ class App {
 
   routes() {
     this.server.use(privateRoutes);
-    this.server.use(swaggerRoutes);
   }
 
   errors() {
