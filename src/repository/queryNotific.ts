@@ -13,7 +13,7 @@ export const buscaNotificPendenteSDB = (findOne: boolean) => `
     nvl(cfg.NFD_ST_AUTHPATH, nfd.NFD_ST_AUTHPATH) as "authPath",
     nfd.NFD_ST_EVENTODESC as "evento"
   from
-    TJS_NOTIFICMOD nfd
+    TJS_INTEGRACAOMOD nfd
     left join TJS_NOTIFICCFG cfg on (
       cfg.NFD_ST_WEBHOOKMETODO = nfd.NFD_ST_WEBHOOKMETODO
       and cfg.NFD_ST_WEBHOOKHOST = nfd.NFD_ST_WEBHOOKHOST
@@ -34,7 +34,7 @@ export const buscaNotificPendenteSDB = (findOne: boolean) => `
 export const updateDataEnvNotificPRC = `
   begin
     update
-      TJS_NOTIFICMOD
+      TJS_INTEGRACAOMOD
     set
       NFD_DT_DATAENV = sysdate
     where NFD_ST_TBLMEGA = :pNFD_ST_TBLMEGA
@@ -47,7 +47,7 @@ export const updateDataEnvNotificPRC = `
 export const gravaLogNotificPRC = `
   begin
     merge into
-      TJS_NOTIFICLOG tgt using (
+      TJS_INTEGRACAOLOG tgt using (
         select
           :pNFD_ST_TBLMEGA as NFD_ST_TBLMEGA,
           :pNFD_ST_PKMEGA as NFD_ST_PKMEGA,

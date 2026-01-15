@@ -1,5 +1,0 @@
-create table
-  TJS_PARAMETROS (
-    WS_ST_HOSTINTEGRADOR varchar2(255) not null,
-    WS_IN_PORTINTEGRADOR number not null
-  )

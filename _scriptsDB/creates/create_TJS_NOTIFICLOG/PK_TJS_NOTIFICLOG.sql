@@ -1,2 +1,0 @@
-alter table TJS_NOTIFICLOG
-add constraint PK_TJS_NOTIFICLOG primary key (LOG_DT_DATA, NFD_ST_TBLMEGA, NFD_ST_PKMEGA)

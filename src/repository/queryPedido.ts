@@ -13,29 +13,20 @@ end;
 `;
 
 export const buscaRecebimentosSDB = `
-with
-  params as (
-    select
-      nvl(:pDATAINI, '01/01/2000') as DATAINI,
-      nvl(:pDATAFIM, '31/12/2099') as DATAFIM
-    from
-      dual
-  )
 select
-  (
-    ped.ORG_TAB_IN_CODIGO || ';' ||
-    ped.ORG_PAD_IN_CODIGO || ';' ||
-    ped.ORG_IN_CODIGO || ';' ||
-    ped.ORG_TAU_ST_CODIGO || ';' ||
-    ped.SER_TAB_IN_CODIGO || ';' ||
-    ped.SER_IN_SEQUENCIA || ';' ||
-    ped.PDC_IN_CODIGO
-  ) as "codigoPedido",
+  to_char(sysdate, 'Y-m-d H:i:s') as "formatdatetime",
   cursor (
     select
-      itp.PRO_IN_CODIGO as "codigoProduto",
-      rec.RCB_DT_DOCUMENTO as "dataRecebimento",
-      rec.IPR_RE_QUANTIDADE as "quantidadeRecebida"
+      -- "numero_pedido": "string",
+      to_char(itp.PDC_IN_CODIGO) as "numero_pedido",
+      -- "numero_linha": 0,
+      itp.ITP_IN_SEQUENCIA as "numero_linha",
+      -- "recebimento_data": "string",
+      rec.RCB_DT_DOCUMENTO as "recebimento_data",
+      -- "recebimento_quantidade": 0,
+      rec.IPR_RE_QUANTIDADE as "recebimento_quantidade",
+      -- "recebimento_numero": 0
+      rec.RCB_ST_NOTA as "recebimento_numero"
     from
       EST_ITENSPEDCOMPRA itp
       inner join EST_PEDIDOSRECEB rec on (
@@ -56,39 +47,25 @@ select
       and itp.SER_TAB_IN_CODIGO = ped.SER_TAB_IN_CODIGO
       and itp.SER_IN_SEQUENCIA = ped.SER_IN_SEQUENCIA
       and itp.PDC_IN_CODIGO = ped.PDC_IN_CODIGO
-  ) as "itens"
+  ) as "pedidos"
 from
-  EST_PEDCOMPRAS ped
-where
-  exists (
-    select
-      1
-    from
-      EST_ITENSPEDCOMPRA itp
-      inner join params on (1 = 1)
-      inner join EST_PEDIDOSRECEB rec on (
-        rec.ORG_TAB_IN_CODIGO = itp.ORG_TAB_IN_CODIGO
-        and rec.ORG_PAD_IN_CODIGO = itp.ORG_PAD_IN_CODIGO
-        and rec.ORG_IN_CODIGO = itp.ORG_IN_CODIGO
-        and rec.ORG_TAU_ST_CODIGO = itp.ORG_TAU_ST_CODIGO
-        and rec.SER_TAB_IN_CODIGO = itp.SER_TAB_IN_CODIGO
-        and rec.SER_IN_SEQUENCIA = itp.SER_IN_SEQUENCIA
-        and rec.PDC_IN_CODIGO = itp.PDC_IN_CODIGO
-        and rec.ITP_IN_SEQUENCIA = itp.ITP_IN_SEQUENCIA
-      )
-    where
-      itp.ORG_TAB_IN_CODIGO = ped.ORG_TAB_IN_CODIGO
-      and itp.ORG_PAD_IN_CODIGO = ped.ORG_PAD_IN_CODIGO
-      and itp.ORG_IN_CODIGO = ped.ORG_IN_CODIGO
-      and itp.ORG_TAU_ST_CODIGO = ped.ORG_TAU_ST_CODIGO
-      and itp.SER_TAB_IN_CODIGO = ped.SER_TAB_IN_CODIGO
-      and itp.SER_IN_SEQUENCIA = ped.SER_IN_SEQUENCIA
-      and itp.PDC_IN_CODIGO = ped.PDC_IN_CODIGO
-      and (
-        rec.RCB_DT_DOCUMENTO >= params.DATAINI
-        and rec.RCB_DT_DOCUMENTO <= params.DATAFIM
-      )
+  TJS_INTEGRACAOMOD mod
+  inner join EST_PEDCOMPRAS ped on (
+    (
+      ped.ORG_TAB_IN_CODIGO || ';' ||
+      ped.ORG_PAD_IN_CODIGO || ';' ||
+      ped.ORG_IN_CODIGO || ';' ||
+      ped.ORG_TAU_ST_CODIGO || ';' ||
+      ped.SER_TAB_IN_CODIGO || ';' ||
+      ped.SER_IN_SEQUENCIA || ';' ||
+      ped.PDC_IN_CODIGO
+    ) = mod.NFD_ST_PKMEGA
   )
+
+where
+  nvl(mod.NFD_DT_DATAMOD, sysdate) > nvl(mod.NFD_DT_DATAENV, sysdate)
+  and mod.NFD_ST_TBLMEGA = 'EST_PEDIDOSRECEB'
+  and nvl(mod.NFD_DT_DATAMOD, sysdate) < (sysdate - INTERVAL '2' MINUTE)
 `;
 
 export const buscaContasPagarSDB = `

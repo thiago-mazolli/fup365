@@ -1,2 +1,0 @@
-alter table TJS_NOTIFICMOD
-add constraint PK_TJS_NOTIFICMOD primary key (NFD_ST_TBLMEGA, NFD_ST_PKMEGA, NFD_ST_WEBHOOKHOST)

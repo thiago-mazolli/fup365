@@ -1,0 +1,79 @@
+-- Create table
+create table
+  TJS_LOGS (
+    LOG_IN_ID number(22) not null,
+    LOG_CH_TYPE char(1),
+    LOG_DT_INSERT date default sysdate,
+    LOG_DT_UPDATE date,
+    LOG_ST_MENSAGEM varchar2(1000),
+    LOG_CL_SCRIPT CLOB,
+    LOG_CL_PARAMS CLOB,
+    LOG_CH_PERM_UPDATE char(1) default 'N',
+    LOG_IN_INT_SERVICO number(22),
+    LOG_CH_INT_STATUS char(1),
+    LOG_CL_INT_XML CLOB,
+    LOG_ST_INT_MSGERRO varchar2(1000),
+    LOG_ST_INT_PKMEGA varchar2(255),
+    LOG_ST_INT_CODTRANSACAO varchar2(100),
+    LOG_ST_CAMPO_ADIC1 varchar2(255),
+    LOG_ST_CAMPO_ADIC2 varchar2(255),
+    LOG_ST_CAMPO_ADIC3 varchar2(255),
+    LOG_ST_CAMPO_ADIC4 varchar2(255),
+    LOG_ST_CAMPO_ADIC5 varchar2(255)
+  )
+;
+
+alter table TJS_LOGS
+add constraint PK_TJS_LOGS primary key (LOG_IN_ID)
+;
+
+comment on column TJS_LOGS.LOG_IN_ID is 'Sequencial unico para cada registro de log'
+;
+
+comment on column TJS_LOGS.LOG_CH_TYPE is 'Tipos de Operações do Log - I: Insert ; D: Delete; U: Update'
+;
+
+comment on column TJS_LOGS.LOG_DT_INSERT is 'Data de inserção do registro de log'
+;
+
+comment on column TJS_LOGS.LOG_DT_UPDATE is 'Data de atualização de um registro de log quando o campo de LOG_CH_PERM_UPDATE for S'
+;
+
+comment on column TJS_LOGS.LOG_ST_MENSAGEM is 'Mensagem de log'
+;
+
+comment on column TJS_LOGS.LOG_CH_PERM_UPDATE is 'Validação de permissão para update do registro de log: S: Permitir e N: Não Permitir'
+;
+
+comment on column TJS_LOGS.LOG_IN_INT_SERVICO is 'Código do serviço do integrador'
+;
+
+comment on column TJS_LOGS.LOG_CH_INT_STATUS is 'Status da integração'
+;
+
+comment on column TJS_LOGS.LOG_CL_INT_XML is 'XML da integração'
+;
+
+comment on column TJS_LOGS.LOG_ST_INT_MSGERRO is 'Mensagem de erro do Integrador'
+;
+
+comment on column TJS_LOGS.LOG_ST_INT_PKMEGA is 'PK Mega do Integrador'
+;
+
+comment on column TJS_LOGS.LOG_ST_INT_CODTRANSACAO is 'Código de transação do integrador'
+;
+
+comment on column TJS_LOGS.LOG_ST_CAMPO_ADIC1 is 'Campo genérico adicional 1'
+;
+
+comment on column TJS_LOGS.LOG_ST_CAMPO_ADIC2 is 'Campo genérico adicional 2'
+;
+
+comment on column TJS_LOGS.LOG_ST_CAMPO_ADIC3 is 'Campo genérico adicional 3'
+;
+
+comment on column TJS_LOGS.LOG_ST_CAMPO_ADIC4 is 'Campo genérico adicional 4'
+;
+
+comment on column TJS_LOGS.LOG_ST_CAMPO_ADIC5 is 'Campo genérico adicional 5'
+;

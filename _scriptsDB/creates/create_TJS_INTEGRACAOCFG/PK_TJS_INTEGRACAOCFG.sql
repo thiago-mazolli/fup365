@@ -1,2 +1,0 @@
-alter table TJS_INTEGRACAOCFG
-add constraint PK_TJS_INTEGRACAOCFG primary key (CFG_ST_METODO, CFG_ST_HOST)

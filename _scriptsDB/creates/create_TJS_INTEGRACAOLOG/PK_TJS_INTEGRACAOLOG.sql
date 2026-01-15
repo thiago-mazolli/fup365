@@ -1,2 +1,0 @@
-alter table TJS_INTEGRACAOLOG
-add constraint PK_TJS_INTEGRACAOLOG primary key (LOG_DT_DATA, MOD_ST_TBLMEGA, MOD_ST_PKMEGA)

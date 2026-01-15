@@ -1,1 +1,0 @@
-comment on column TJS_INTEGRACAOCFG.CFG_ST_METODO is 'Método - POST; PUT; GET; DELETE'

@@ -1,2 +1,0 @@
-alter table TJS_NOTIFICCFG
-add constraint PK_TJS_NOTIFICCFG primary key (NFD_ST_WEBHOOKMETODO, NFD_ST_WEBHOOKHOST)

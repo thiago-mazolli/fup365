@@ -1,2 +1,0 @@
-alter table TJS_INTEGRACAOMOD
-add constraint PK_TJS_INTEGRACAOMOD primary key (MOD_ST_TBLMEGA, MOD_ST_PKMEGA)

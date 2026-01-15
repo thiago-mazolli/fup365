@@ -1,9 +1,0 @@
-create table
-  TJS_INTEGRACAOCFG (
-    CFG_ST_METODO varchar2(10) not null,
-    CFG_ST_HOST varchar2(255) not null,
-    CFG_ST_AUTHKEY varchar2(4000),
-    CFG_ST_AUTHMETODO varchar2(10),
-    CFG_ST_AUTHHOST varchar2(255),
-    CFG_ST_AUTHPATH varchar2(255)
-  )

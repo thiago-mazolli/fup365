@@ -5,9 +5,9 @@ import Integracao from '../models/Integracao';
 import AppError from '../helpers/AppError';
 
 export default class IntegracaoController {
-  private static async integraDados(evento: 'I' | 'R' | 'C', pedidos: any[]) {
-    for (let i = 0; i < pedidos.length; i++) {
-      const { tblMega, pkMega, pedido } = pedidos[i];
+  private static async integraDados(evento: 'I' | 'R' | 'C', registros: any[]) {
+    for (let i = 0; i < registros.length; i++) {
+      const { tblMega, pkMega, registro } = registros[i];
 
       const canIntegrate = await Integracao.validaEnvio(tblMega, pkMega);
 
@@ -21,19 +21,21 @@ export default class IntegracaoController {
               : '/api/postOrdersCanceled';
 
           const resp = await apiFup365.post(`${path}`, {
-            ...pedido,
+            ...registro,
           });
 
-          const { data, status, statusText, request } = resp;
+          const { data, status, statusText } = resp;
 
-          if (status === 200) {
+          if (data.status.toUpperCase() === 'SUCCESS') {
             await Integracao.updateDataEnvio(tblMega, pkMega);
 
             await Integracao.gravaLogEnvio(
               tblMega,
               pkMega,
               'I',
-              'Integracaoação enviada com sucesso'
+              'Integração enviada com sucesso',
+              JSON.stringify(registro || {}),
+              JSON.stringify(data || {})
             );
           } else {
             await Integracao.gravaLogEnvio(
@@ -41,7 +43,7 @@ export default class IntegracaoController {
               pkMega,
               'E',
               `Erro: ${status} - ${statusText}`,
-              JSON.stringify(request || {}),
+              JSON.stringify(registro || {}),
               JSON.stringify(data || {})
             );
           }
@@ -49,9 +51,9 @@ export default class IntegracaoController {
           if ((error as any).code === 'ERR_BAD_RESPONSE') {
             throw new AppError({
               statusCode: 500,
-              header: 'Erro de Comunicação do Webhook',
+              header: 'Erro de Comunicação',
               error: {
-                message: 'A API de Comunicação do Webhook não esta respondendo',
+                message: 'A API de Comunicação não esta respondendo',
               },
             });
           }
@@ -60,7 +62,7 @@ export default class IntegracaoController {
             tblMega,
             pkMega,
             'E',
-            'Falha na comunicação com o webhook',
+            'Falha na comunicação',
             JSON.stringify((error as any).config || {}),
             JSON.stringify({
               message: `${(error as any).code || ''} - ${(error as any)
@@ -75,25 +77,25 @@ export default class IntegracaoController {
   }
 
   static async postOrdersItems(_: Request, res: Response) {
-    const pedidos = await Integracao.buscaIntegracaoPendente();
+    const registros = await Integracao.buscaIntegracaoPedidos();
 
-    const resp = await IntegracaoController.integraDados('I', pedidos);
+    const resp = await IntegracaoController.integraDados('I', registros);
 
     return res.status(200).send(resp);
   }
 
   static async postOrdersReceived(_: Request, res: Response) {
-    const pedidos = await Integracao.buscaIntegracaoPendente();
+    const registros = await Integracao.buscaIntegracaoRecebimento();
 
-    const resp = await IntegracaoController.integraDados('R', pedidos);
+    const resp = await IntegracaoController.integraDados('R', registros);
 
     return res.status(200).send(resp);
   }
 
   static async postOrdersCanceled(_: Request, res: Response) {
-    const pedidos = await Integracao.buscaIntegracaoPendente();
+    const registros = await Integracao.buscaIntegracaoCancelamentos();
 
-    const resp = await IntegracaoController.integraDados('C', pedidos);
+    const resp = await IntegracaoController.integraDados('C', registros);
 
     return res.status(200).send(resp);
   }

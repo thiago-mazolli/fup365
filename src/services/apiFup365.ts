@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
-import { hostHomolog, hostpProduct, login, password } from '../config';
+import { hostHomolog, hostProduct, login, password } from '../config';
 
-// const baseURL = `${hostpProduct}/api/authentication`;
+// const baseURL = `${hostProduct}/api/authentication`;
 const baseURL = `${hostHomolog}/api/authentication`;
 
 const authURL = `${baseURL}/api/authentication`;
