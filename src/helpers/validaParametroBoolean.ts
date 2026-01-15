@@ -1,4 +1,4 @@
-import { AppError } from 'dev4-code-library';
+import AppError from './AppError';
 
 const validaParametroBoolean = (parametro: string, paramName: string) => {
   if (!['S', 'N'].includes(parametro.toUpperCase())) {

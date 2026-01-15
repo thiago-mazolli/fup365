@@ -2,16 +2,13 @@ import 'express-async-errors';
 
 import express, { Express } from 'express';
 import cors from 'cors';
-import {
-  processListener,
-  setTimeOutRequest,
-  logErrors,
-} from 'dev4-node-library';
 
-import privateRoutes from './routes/privateRoutes';
-import publicRoutes from './routes/publicRoutes';
+import privateRoutes from './routes';
 import swaggerRoutes from './swagger/routes';
 import gravaLogErros from './middlewares/gravaLogErros';
+import processListener from './middlewares/processListener';
+import setTimeOutRequest from './middlewares/setTimeOutRequest';
+import logErrors from './middlewares/logErrors';
 
 class App {
   server: Express;
@@ -48,7 +45,6 @@ class App {
 
   routes() {
     this.server.use(privateRoutes);
-    this.server.use(publicRoutes);
     this.server.use(swaggerRoutes);
   }
 

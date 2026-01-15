@@ -1,4 +1,4 @@
-import { AppError } from 'dev4-code-library';
+import AppError from './AppError';
 import validaDataString from './validaDataString';
 
 const validaParametroData = (data: any, paramName: string) => {

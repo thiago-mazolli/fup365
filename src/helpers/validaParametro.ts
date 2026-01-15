@@ -1,4 +1,4 @@
-import { AppError } from 'dev4-code-library';
+import AppError from './AppError';
 
 const validaParametro = (parametro: any, paramName: string) => {
   if (!parametro) {

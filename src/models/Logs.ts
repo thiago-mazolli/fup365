@@ -1,19 +1,24 @@
-import { IAppError, formataInteger } from 'dev4-code-library';
 import {
   buscaLogIntegracaoSDB,
   buscaLogSDB,
   gravaLogPRC,
 } from '../repository/queryLogs';
-import apiConector from '../services/apiConector';
+import connectionAttributes, { libDir, disableLogs } from '../config/database';
+import executaScript from '../helpers/executaScript';
+import IAppError from '../interfaces/IAppError';
+import formataInteger from '../helpers/formataInteger';
 
 export default class Logs {
-  static async buscaLogsGenerico(usercode: number, clientid: string) {
-    const resp = await apiConector(usercode, clientid).put('/execScript', {
+  static async buscaLogsGenerico() {
+    const data = await executaScript({
+      connectionAttributes,
+      libDir,
+      disableLogs,
       script: buscaLogSDB,
       params: {},
     });
 
-    return resp.data.map((res: any) => ({
+    return data.map((res: any) => ({
       id: res.LOG_IN_ID,
       type: res.LOG_CH_TYPE,
       dtUpdate: res.LOG_DT_UPDATE,
@@ -30,13 +35,16 @@ export default class Logs {
     }));
   }
 
-  static async buscaLogsIntegracao(usercode: number, clientid: string) {
-    const resp = await apiConector(usercode, clientid).put('/execScript', {
+  static async buscaLogsIntegracao() {
+    const data = await executaScript({
+      connectionAttributes,
+      libDir,
+      disableLogs,
       script: buscaLogIntegracaoSDB,
       params: {},
     });
 
-    return resp.data.map((res: any) => ({
+    return data.map((res: any) => ({
       id: res.LOG_IN_ID,
       intStatus: res.LOG_CH_INT_STATUS,
       dtUpdate: res.LOG_DT_UPDATE,
@@ -51,15 +59,19 @@ export default class Logs {
     }));
   }
 
-  static async gravaLog(usercode: number, clientid: string, err: IAppError) {
-    await apiConector(usercode, clientid).post('/execProcedure', {
+  static async gravaLog(err: IAppError) {
+    await executaScript({
+      connectionAttributes,
+      libDir,
+      disableLogs,
+      execSQL: true,
       script: gravaLogPRC,
       params: {
         pLOG_IN_ID: formataInteger(err.logId),
         pLOG_CH_TYPE: 'E',
         pLOG_ST_MENSAGEM: err.error || null,
         pLOG_CL_SCRIPT: err.script || null,
-        pLOG_CL_PARAMS: err.params ? JSON.stringify(err.params, null, 2) : null,
+        pLOG_CL_PARAMS: err.params ? JSON.stringify(err.params) : null,
         pLOG_CH_PERM_UPDATE: err.permUpdate || 'N',
         pLOG_IN_INT_SERVICO: formataInteger(err.intServico),
         pLOG_CH_INT_STATUS: err.intStatus || null,

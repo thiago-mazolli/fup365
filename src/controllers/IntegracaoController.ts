@@ -1,202 +1,100 @@
 import { Request, Response } from 'express';
-import { consoleLog } from 'dev4-code-library';
-import { Axios } from 'axios';
-import apiConector from '../services/apiConector';
-import apiME from '../services/apiME';
-import { formatResponse } from '../helpers/formatResponse';
+
+import apiFup365 from '../services/apiFup365';
 import Integracao from '../models/Integracao';
-import Usuario from '../models/Usuario';
-import Agente from '../models/Agente';
-import Produto from '../models/Produto';
+import AppError from '../helpers/AppError';
 
 export default class IntegracaoController {
-  static async integraDados(req: Request, res: Response) {
-    const { clientid } = req.headers;
+  private static async integraDados(evento: 'I' | 'R' | 'C', pedidos: any[]) {
+    for (let i = 0; i < pedidos.length; i++) {
+      const { tblMega, pkMega, pedido } = pedidos[i];
 
-    consoleLog('clientid', clientid);
-
-    // BUSCA AS INTEGRAÇÕES PENDENTES
-    const integracoes = await Integracao.buscaIntegracaoPendente(
-      apiConector(1, clientid as string)
-    );
-
-    consoleLog('integracoes', integracoes);
-
-    for (let i = 0; i < integracoes.length; i++) {
-      const {
-        tblMega,
-        pkMega,
-        metodo,
-        host,
-        path,
-        authHost,
-        authMetodo,
-        authKey,
-        authPath,
-        idMe,
-      } = integracoes[i];
-
-      const canIntegrate = await Integracao.validaEnvio(
-        apiConector(1, clientid as string),
-        tblMega,
-        pkMega
-      );
-      consoleLog('canIntegrate', canIntegrate);
+      const canIntegrate = await Integracao.validaEnvio(tblMega, pkMega);
 
       if (canIntegrate) {
-        let body: any;
-
         try {
-          consoleLog('tblMega/pkMega', `${tblMega}/${pkMega}`);
+          const path =
+            evento === 'I'
+              ? '/api/postOrdersItems'
+              : evento === 'R'
+              ? '/api/postOrdersReceived'
+              : '/api/postOrdersCanceled';
 
-          switch (tblMega) {
-            case 'GLO_GRUPO_USUARIO': {
-              body = await Usuario.buscaDadosUsuario(
-                apiConector(1, clientid as string),
-                pkMega
-              );
-              break;
-            }
-            case 'GLO_AGENTES': {
-              body = await Agente.buscaDadosAgente(
-                apiConector(1, clientid as string),
-                pkMega
-              );
-              break;
-            }
-            case 'EST_PRODUTOS': {
-              body = await Produto.buscaDadosProduto(
-                apiConector(1, clientid as string),
-                pkMega
-              );
-              break;
-            }
-            default: {
-              body = {};
-              break;
-            }
-          }
+          const resp = await apiFup365.post(`${path}`, {
+            ...pedido,
+          });
 
-          consoleLog('Enviando para o ME');
-          consoleLog('body', body);
+          const { data, status, statusText, request } = resp;
 
-          const pathFinal = metodo === 'put' ? `${path}/${idMe}` : `${path}`;
-
-          consoleLog('metodo', metodo);
-          consoleLog('pathFinal', pathFinal);
-
-          const respME = await apiME(
-            host,
-            authHost,
-            authMetodo,
-            authPath,
-            authKey
-          )[metodo as keyof typeof Axios](
-            `${pathFinal}`,
-            {},
-            {
-              headers: {
-                'X-ME-CORRELATION-ID': pkMega,
-              },
-            }
-          );
-
-          consoleLog('respME', respME);
-
-          const response = formatResponse(respME);
-
-          consoleLog('formatResponse(respME)', response);
-
-          let correlationId: string;
-
-          switch (tblMega) {
-            case 'GLO_GRUPO_USUARIO': {
-              correlationId = response.data.correlationId;
-              break;
-            }
-            case 'GLO_AGENTES': {
-              correlationId = response.data.correlationId;
-              break;
-            }
-            case 'EST_PRODUTOS': {
-              correlationId = response.data.correlationId;
-              break;
-            }
-            default: {
-              correlationId = '';
-              break;
-            }
-          }
-
-          await Integracao.updateDataEnvio(
-            apiConector(1, clientid as string),
-            tblMega,
-            pkMega,
-            correlationId
-          );
-
-          await Integracao.gravaLogEnvio(
-            apiConector(1, clientid as string),
-            tblMega,
-            pkMega,
-            'I',
-            'Integração realizada com sucesso',
-            JSON.stringify(body, null, 2),
-            JSON.stringify(response || {}, null, 2)
-          );
-        } catch (error) {
-          const { response } = error;
-          if (response.status === 500) {
-            consoleLog('IntegracaoController catch (error)', error);
+          if (status === 200) {
+            await Integracao.updateDataEnvio(tblMega, pkMega);
 
             await Integracao.gravaLogEnvio(
-              apiConector(1, clientid as string),
               tblMega,
               pkMega,
-              'E',
-              'Falha na comunicação com o mercado eletrônico',
-              JSON.stringify(error.config || {}, null, 2),
-              JSON.stringify(
-                {
-                  message: `${error.code || ''} - ${error.message || ''}`,
-                },
-                null,
-                2
-              )
+              'I',
+              'Integracaoação enviada com sucesso'
             );
           } else {
-            const errors = response.data.errors as Record<string, string[]>;
-
-            const mensagem = `${response.data.title}\n${Object.entries(errors)
-              .map(([field, mensagens]) =>
-                mensagens
-                  .map((msg, i) => {
-                    const texto = msg.replace(/'/g, '');
-                    const labelErro =
-                      mensagens.length > 1 ? ` (erro ${i + 1})` : '';
-                    return `${field}: ${texto}${labelErro}`;
-                  })
-                  .join('\n')
-              )
-              .join('\n')}`;
-
             await Integracao.gravaLogEnvio(
-              apiConector(1, clientid as string),
               tblMega,
               pkMega,
               'E',
-              mensagem,
-              JSON.stringify(body, null, 2),
-              JSON.stringify(response || {}, null, 2)
+              `Erro: ${status} - ${statusText}`,
+              JSON.stringify(request || {}),
+              JSON.stringify(data || {})
             );
           }
+        } catch (error) {
+          if ((error as any).code === 'ERR_BAD_RESPONSE') {
+            throw new AppError({
+              statusCode: 500,
+              header: 'Erro de Comunicação do Webhook',
+              error: {
+                message: 'A API de Comunicação do Webhook não esta respondendo',
+              },
+            });
+          }
+
+          await Integracao.gravaLogEnvio(
+            tblMega,
+            pkMega,
+            'E',
+            'Falha na comunicação com o webhook',
+            JSON.stringify((error as any).config || {}),
+            JSON.stringify({
+              message: `${(error as any).code || ''} - ${(error as any)
+                .message || ''}`,
+            })
+          );
         }
       }
     }
 
-    consoleLog('Fim');
+    return { message: 'Metodo Executado' };
+  }
 
-    return res.status(200).send();
-    // return { message: 'Metodo Executado' };
+  static async postOrdersItems(_: Request, res: Response) {
+    const pedidos = await Integracao.buscaIntegracaoPendente();
+
+    const resp = await IntegracaoController.integraDados('I', pedidos);
+
+    return res.status(200).send(resp);
+  }
+
+  static async postOrdersReceived(_: Request, res: Response) {
+    const pedidos = await Integracao.buscaIntegracaoPendente();
+
+    const resp = await IntegracaoController.integraDados('R', pedidos);
+
+    return res.status(200).send(resp);
+  }
+
+  static async postOrdersCanceled(_: Request, res: Response) {
+    const pedidos = await Integracao.buscaIntegracaoPendente();
+
+    const resp = await IntegracaoController.integraDados('C', pedidos);
+
+    return res.status(200).send(resp);
   }
 }
