@@ -68,7 +68,7 @@ export const validaEnvioSBD = `
   select
     1
   from TJS_INTEGRACAOMOD mod
-  where nvl(mod.NFD_DT_DATAMOD, sysdate) > nvl(mod.NFD_DT_DATAENV, sysdate)
-    and mod.NFD_ST_TBLMEGA = :pNFD_ST_TBLMEGA
-    and mod.NFD_ST_PKMEGA = :pNFD_ST_PKMEGA
+  where nvl(mod.MOD_DT_DATAMOD, sysdate) > nvl(mod.MOD_DT_DATAENV, sysdate)
+    and mod.MOD_ST_TBLMEGA = :pMOD_ST_TBLMEGA
+    and mod.MOD_ST_PKMEGA = :pMOD_ST_PKMEGA
 `;

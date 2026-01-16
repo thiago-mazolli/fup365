@@ -68,7 +68,15 @@ export default class Integracao {
       },
     });
 
-    return data;
+    return data.map((d: any) => ({
+      tblMega: d.MOD_ST_TBLMEGA,
+      pkMega: d.MOD_ST_PKMEGA,
+      registro: {
+        ...d,
+        dataModificacao: dateDBToDateJSON(d.dataModificacao),
+        dataEnvio: dateDBToDateJSON(d.dataEnvio),
+      },
+    }));
   }
 
   static async updateDataEnvio(tblMega: string, pkMega: string) {

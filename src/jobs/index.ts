@@ -1,7 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import cron from 'node-cron';
 import axios from 'axios';
-import { hostLocal, taskPedido, taskPedidoCanc, taskRecebimento } from '../config';
+import {
+  hostLocal,
+  taskPedido,
+  taskPedidoCanc,
+  taskRecebimento,
+} from '../config';
 
 let isRunningJobPedido = false;
 
