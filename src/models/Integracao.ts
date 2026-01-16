@@ -5,12 +5,10 @@ import {
   gravaLogEnvioPRC,
   updateDataEnvioPRC,
   validaEnvioSBD,
-} from '../repository/queryIntegracao';
-import {
   buscaPedidosSDB,
   buscaPedidosCanceladosSDB,
   buscaRecebimentosSDB,
-} from '../repository/queryPedido';
+} from '../repository/queryIntegracao';
 
 export default class Integracao {
   static async buscaPedidos(): Promise<[]> {
