@@ -3,6 +3,7 @@ create or replace trigger TJS_T_ESTPEDCOMPRAS
   for each row
 declare
   vMOD_ST_TBLMEGA TJS_INTEGRACAOMOD.MOD_ST_TBLMEGA%type;
+  vINTEGRAFUP     number;
 begin
   begin
     select decode(count(1), 0, 0, 1)

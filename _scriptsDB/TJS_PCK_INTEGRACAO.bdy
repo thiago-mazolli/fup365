@@ -4,7 +4,6 @@ create or replace package body TJS_PCK_INTEGRACAO is
     pMOD_ST_TBLMEGA in TJS_INTEGRACAOMOD.MOD_ST_TBLMEGA%type,
     pMOD_ST_PKMEGA  in TJS_INTEGRACAOMOD.MOD_ST_PKMEGA%type
   ) is
-    vMetodo varchar2(10);
   begin
     merge into
       TJS_INTEGRACAOMOD tgt using (
