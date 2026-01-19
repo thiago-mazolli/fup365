@@ -23,6 +23,10 @@ apiFup365.interceptors.request.use(async config => {
         login,
         password,
       },
+      auth: {
+        username: login,
+        password,
+      },
     });
 
     const { token } = respToken.data;

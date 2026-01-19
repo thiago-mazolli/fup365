@@ -23,12 +23,39 @@ export default class Integracao {
     });
 
     return data.map((d: any) => ({
-      tblMega: d.MOD_ST_TBLMEGA,
-      pkMega: d.MOD_ST_PKMEGA,
-      registro: {
-        ...d,
-        dataModificacao: dateDBToDateJSON(d.dataModificacao),
-        dataEnvio: dateDBToDateJSON(d.dataEnvio),
+      pkMega: d.tblMega,
+      tblMega: d.pkMega,
+      dataModificacao: dateDBToDateJSON(d.dataModificacao),
+      dataEnvio: dateDBToDateJSON(d.dataEnvio),
+      registros: {
+        formatdatetime: d.formatdatetime,
+        pedidos: [
+          {
+            numero_pedido: d.numero_pedido,
+            numero_legado: d.numero_legado,
+            data_emissao: d.data_emissao,
+            cliente_cnpj: d.cliente_cnpj,
+            cliente_centro: d.cliente_centro,
+            fornecedor: {
+              fornecedor_cnpj: d.fornecedor_cnpj,
+              fornecedor_razao: d.fornecedor_razao,
+              fornecedor_endereco: d.fornecedor_endereco,
+              fornecedor_numero: d.fornecedor_numero,
+              fornecedor_bairro: d.fornecedor_bairro,
+              fornecedor_cidade: d.fornecedor_cidade,
+              fornecedor_uf: d.fornecedor_uf,
+              fornecedor_contato1: d.contatos[0].fornecedor_contato,
+              fornecedor_telefone1: d.contatos[0].fornecedor_telefone,
+              fornecedor_celular1: d.contatos[0].fornecedor_celular,
+              fornecedor_email1: d.contatos[0].fornecedor_email,
+              fornecedor_contato2: d.contatos[0].fornecedor_contato,
+              fornecedor_telefone2: d.contatos[0].fornecedor_telefone,
+              fornecedor_celular2: d.contatos[0].fornecedor_celular,
+              fornecedor_email2: d.contatos[0].fornecedor_email,
+            },
+            linhas: d.linhas,
+          },
+        ],
       },
     }));
   }
@@ -47,10 +74,10 @@ export default class Integracao {
     return data.map((d: any) => ({
       tblMega: d.MOD_ST_TBLMEGA,
       pkMega: d.MOD_ST_PKMEGA,
+      dataModificacao: dateDBToDateJSON(d.dataModificacao),
+      dataEnvio: dateDBToDateJSON(d.dataEnvio),
       registro: {
         ...d,
-        dataModificacao: dateDBToDateJSON(d.dataModificacao),
-        dataEnvio: dateDBToDateJSON(d.dataEnvio),
       },
     }));
   }
@@ -67,12 +94,13 @@ export default class Integracao {
     });
 
     return data.map((d: any) => ({
-      tblMega: d.MOD_ST_TBLMEGA,
-      pkMega: d.MOD_ST_PKMEGA,
+      tblMega: d.tblMega,
+      pkMega: d.pkMega,
+      dataModificacao: dateDBToDateJSON(d.dataModificacao),
+      dataEnvio: dateDBToDateJSON(d.dataEnvio),
       registro: {
-        ...d,
-        dataModificacao: dateDBToDateJSON(d.dataModificacao),
-        dataEnvio: dateDBToDateJSON(d.dataEnvio),
+        formatdatetime: d.formatdatetime,
+        pedidos: d.pedidos,
       },
     }));
   }
