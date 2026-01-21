@@ -1,6 +1,9 @@
 --TABELAS
 select t.*, rowid from TJS_AGENTE t;
 
+--VIEW
+select t.* from TJS_VW_INTEGRACAO t;
+
 --LOGS
 select t.*, rowid from TJS_INTEGRACAOMOD t;
 select t.*, rowid from TJS_INTEGRACAOLOG t;
