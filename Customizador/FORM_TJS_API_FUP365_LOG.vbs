@@ -336,7 +336,7 @@ Sub Cl_Integracao_OnAfterOpen(Sender As TMgClientDataSet)
 
     i = i + 1
     FieldByName("AGN_IN_CODIGO").DisplayLabel = "Cód Agente"
-    FieldByName("AGN_IN_CODIGO").DisplayWidth = 8
+    FieldByName("AGN_IN_CODIGO").DisplayWidth = 10  
     FieldByName("AGN_IN_CODIGO").Visible = True
     FieldByName("AGN_IN_CODIGO").Index = i
 

@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'api-fup365',
-      script: './dist/server.js',
+      script: './api-fup365.exe',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,

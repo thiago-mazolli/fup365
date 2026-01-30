@@ -1,8 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
-import { hostHomolog, hostProduct, login, password } from '../config';
+import { hostProduct, login, password, authorization } from '../config';
 
-// const baseURL = `${hostProduct}/api/authentication`;
-const baseURL = `${hostHomolog}/api/authentication`;
+const baseURL = `${hostProduct}/api/authentication`;
 
 const authURL = `${baseURL}/api/authentication`;
 
@@ -18,7 +17,10 @@ apiFup365.interceptors.request.use(async config => {
     const respToken = await axios.request({
       method: 'POST',
       url: authURL,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: authorization,
+      },
       data: {
         login,
         password,

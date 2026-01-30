@@ -27,7 +27,7 @@ export default class Integracao {
       tblMega: d.pkMega,
       dataModificacao: dateDBToDateJSON(d.dataModificacao),
       dataEnvio: dateDBToDateJSON(d.dataEnvio),
-      registros: {
+      body: {
         formatdatetime: d.formatdatetime,
         pedidos: [
           {
@@ -48,10 +48,10 @@ export default class Integracao {
               fornecedor_telefone1: d.contatos[0].fornecedor_telefone,
               fornecedor_celular1: d.contatos[0].fornecedor_celular,
               fornecedor_email1: d.contatos[0].fornecedor_email,
-              fornecedor_contato2: d.contatos[0].fornecedor_contato,
-              fornecedor_telefone2: d.contatos[0].fornecedor_telefone,
-              fornecedor_celular2: d.contatos[0].fornecedor_celular,
-              fornecedor_email2: d.contatos[0].fornecedor_email,
+              fornecedor_contato2: d.contatos[1].fornecedor_contato,
+              fornecedor_telefone2: d.contatos[1].fornecedor_telefone,
+              fornecedor_celular2: d.contatos[1].fornecedor_celular,
+              fornecedor_email2: d.contatos[1].fornecedor_email,
             },
             linhas: d.linhas,
           },
@@ -76,8 +76,15 @@ export default class Integracao {
       pkMega: d.MOD_ST_PKMEGA,
       dataModificacao: dateDBToDateJSON(d.dataModificacao),
       dataEnvio: dateDBToDateJSON(d.dataEnvio),
-      registro: {
-        ...d,
+      body: {
+        formatdatetime: d.formatdatetime,
+        pedidos: [
+          {
+            numero_pedido: d.numero_pedido,
+            numero_linha: 0,
+            cancelado_data: d.cancelado_data,
+          },
+        ],
       },
     }));
   }
@@ -98,7 +105,7 @@ export default class Integracao {
       pkMega: d.pkMega,
       dataModificacao: dateDBToDateJSON(d.dataModificacao),
       dataEnvio: dateDBToDateJSON(d.dataEnvio),
-      registro: {
+      body: {
         formatdatetime: d.formatdatetime,
         pedidos: d.pedidos,
       },

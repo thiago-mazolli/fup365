@@ -7,7 +7,7 @@ import AppError from '../helpers/AppError';
 export default class IntegracaoController {
   private static async integraDados(evento: 'I' | 'R' | 'C', registros: any[]) {
     for (let i = 0; i < registros.length; i++) {
-      const { tblMega, pkMega, registro } = registros[i];
+      const { tblMega, pkMega, body } = registros[i];
 
       const canIntegrate = await Integracao.validaEnvio(tblMega, pkMega);
 
@@ -21,7 +21,7 @@ export default class IntegracaoController {
               : '/api/postOrdersCanceled';
 
           const resp = await apiFup365.post(`${path}`, {
-            ...registro,
+            ...body,
           });
 
           const { data, status, statusText } = resp;
@@ -34,7 +34,7 @@ export default class IntegracaoController {
               pkMega,
               'I',
               'Integração enviada com sucesso',
-              JSON.stringify(registro || {}),
+              JSON.stringify(body || {}),
               JSON.stringify(data || {})
             );
           } else {
@@ -43,7 +43,7 @@ export default class IntegracaoController {
               pkMega,
               'E',
               `Erro: ${status} - ${statusText}`,
-              JSON.stringify(registro || {}),
+              JSON.stringify(body || {}),
               JSON.stringify(data || {})
             );
           }
