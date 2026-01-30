@@ -3,7 +3,6 @@ import {
   buscaLogSDB,
   gravaLogPRC,
 } from '../repository/queryLogs';
-import connectionAttributes, { libDir, disableLogs } from '../config/database';
 import executaScript from '../helpers/executaScript';
 import IAppError from '../interfaces/IAppError';
 import formataInteger from '../helpers/formataInteger';
@@ -11,9 +10,6 @@ import formataInteger from '../helpers/formataInteger';
 export default class Logs {
   static async buscaLogsGenerico() {
     const data = await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       script: buscaLogSDB,
       params: {},
     });
@@ -37,9 +33,6 @@ export default class Logs {
 
   static async buscaLogsIntegracao() {
     const data = await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       script: buscaLogIntegracaoSDB,
       params: {},
     });
@@ -61,9 +54,6 @@ export default class Logs {
 
   static async gravaLog(err: IAppError) {
     await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       execSQL: true,
       script: gravaLogPRC,
       params: {

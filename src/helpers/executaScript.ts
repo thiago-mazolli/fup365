@@ -2,6 +2,7 @@
 import oracledb, { BLOB, BUFFER, CLOB, OUT_FORMAT_OBJECT } from 'oracledb';
 import AppError from './AppError';
 import IExecutaScriptProps from '../interfaces/IExecutaScriptProps';
+import connectionAttributes, { disableLogs, libDir } from '../config/database';
 
 /**
  * Função para fechar o pool de conexões e encerrar o processo
@@ -36,13 +37,10 @@ const doRelease = (connection: any, disableLogs: boolean) => {
  * @returns {Promise<any>} - O resultado da execução do script
  */
 const executaScript = async ({
-  connectionAttributes,
   script,
   params,
   execSQL = false,
-  disableLogs = false,
   numeroTentativas = 3,
-  libDir = '',
 }: IExecutaScriptProps): Promise<any> => {
   if (!connectionAttributes.connectString) {
     return;
@@ -66,7 +64,7 @@ const executaScript = async ({
     oracledb.fetchAsBuffer = [oracledb.BLOB];
 
     // Inicializa o cliente Oracle, se um diretório de bibliotecas for fornecido
-    if (libDir !== '' && libDir !== undefined) {
+    if (libDir !== undefined) {
       disableLogs === false && console.log('libDir', libDir);
       try {
         oracledb.initOracleClient({

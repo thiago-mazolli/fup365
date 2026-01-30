@@ -1,5 +1,5 @@
 import dateDBToDateJSON from '../helpers/dateDBToDateJSON';
-import connectionAttributes, { disableLogs, libDir } from '../config/database';
+
 import executaScript from '../helpers/executaScript';
 import {
   gravaLogEnvioPRC,
@@ -13,9 +13,6 @@ import {
 export default class Integracao {
   static async buscaPedidos(): Promise<[]> {
     const data = await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       script: buscaPedidosSDB,
       params: {
         // pMOD_ST_TBLMEGA: tblMega,
@@ -62,9 +59,6 @@ export default class Integracao {
 
   static async buscaPedidosCancelados(): Promise<[]> {
     const data = await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       script: buscaPedidosCanceladosSDB,
       params: {
         // pMOD_ST_TBLMEGA: tblMega,
@@ -91,9 +85,6 @@ export default class Integracao {
 
   static async buscaRecebimentos(): Promise<[]> {
     const data = await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       script: buscaRecebimentosSDB,
       params: {
         // pMOD_ST_TBLMEGA: tblMega,
@@ -114,9 +105,6 @@ export default class Integracao {
 
   static async updateDataEnvio(tblMega: string, pkMega: string) {
     const data = await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       execSQL: true,
       script: updateDataEnvioPRC,
       params: {
@@ -130,9 +118,6 @@ export default class Integracao {
 
   static async validaEnvio(tblMega: string, pkMega: string) {
     const data = await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       script: validaEnvioSBD,
       params: {
         pMOD_ST_TBLMEGA: tblMega,
@@ -152,9 +137,6 @@ export default class Integracao {
     response?: string
   ) {
     const data = await executaScript({
-      connectionAttributes,
-      libDir,
-      disableLogs,
       execSQL: true,
       script: gravaLogEnvioPRC,
       params: {

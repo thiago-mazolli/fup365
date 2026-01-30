@@ -1,5 +1,5 @@
-export const disableLogs = true;
-export const libDir = 'C:/Oracle/product/11.2.0/client_1_64';
+export const disableLogs = false;
+export const libDir = 'C:/_apps/instantclient_21_14_64x/';
 
 const connectionAttributes = {
   user: 'usina',

@@ -33,10 +33,10 @@ class App {
       next();
     });
     this.server.use(cors());
-    this.server.use(express.json({ limit: '900mb' }));
+    this.server.use(express.json({ limit: '1gb' }));
     this.server.use(
       express.urlencoded({
-        limit: '900mb',
+        limit: '1gb',
         extended: true,
         parameterLimit: 100000,
       })
