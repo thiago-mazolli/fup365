@@ -7,12 +7,9 @@ privateRoutes.get('/', (_, res) => {
   return res.status(200).send({ mensagem: 'API em Execução' });
 });
 
-privateRoutes.post('/envia-pedidos', IntegracaoController.postOrdersItems);
-privateRoutes.post(
-  '/envia-cancelados',
-  IntegracaoController.postOrdersCanceled
-);
-privateRoutes.post(
+privateRoutes.get('/envia-pedidos', IntegracaoController.postOrdersItems);
+privateRoutes.get('/envia-cancelados', IntegracaoController.postOrdersCanceled);
+privateRoutes.get(
   '/envia-recebimentos',
   IntegracaoController.postOrdersReceived
 );
