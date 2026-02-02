@@ -1,5 +1,5 @@
-export const disableLogs = false;
-export const libDir = 'C:/_apps/instantclient_21_14_64x/';
+export const disableLogs = true;
+export const libDir = 'C:/APIs/api-mega-fup365/instantclient_21_14_64x/';
 
 const connectionAttributes = {
   user: 'usina',

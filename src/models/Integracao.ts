@@ -12,12 +12,14 @@ import {
 
 export default class Integracao {
   static async buscaPedidos(): Promise<[]> {
+    console.log('buscaPedidos');
     const data = await executaScript({
       script: buscaPedidosSDB,
       params: {
         // pMOD_ST_TBLMEGA: tblMega,
       },
     });
+    console.log('buscaPedidos data:', data);
 
     return data.map((d: any) => ({
       pkMega: d.tblMega,
@@ -58,12 +60,14 @@ export default class Integracao {
   }
 
   static async buscaPedidosCancelados(): Promise<[]> {
+    console.log('buscaPedidosCancelados');
     const data = await executaScript({
       script: buscaPedidosCanceladosSDB,
       params: {
         // pMOD_ST_TBLMEGA: tblMega,
       },
     });
+    console.log('buscaPedidosCancelados data:', data);
 
     return data.map((d: any) => ({
       tblMega: d.MOD_ST_TBLMEGA,
@@ -84,12 +88,14 @@ export default class Integracao {
   }
 
   static async buscaRecebimentos(): Promise<[]> {
+    console.log('buscaRecebimentos');
     const data = await executaScript({
       script: buscaRecebimentosSDB,
       params: {
         // pMOD_ST_TBLMEGA: tblMega,
       },
     });
+    console.log('buscaRecebimentos data:', data);
 
     return data.map((d: any) => ({
       tblMega: d.tblMega,
@@ -104,6 +110,7 @@ export default class Integracao {
   }
 
   static async updateDataEnvio(tblMega: string, pkMega: string) {
+    console.log('updateDataEnvio');
     const data = await executaScript({
       execSQL: true,
       script: updateDataEnvioPRC,
@@ -112,11 +119,13 @@ export default class Integracao {
         pMOD_ST_PKMEGA: pkMega,
       },
     });
+    console.log('updateDataEnvio data:', data);
 
     return data;
   }
 
   static async validaEnvio(tblMega: string, pkMega: string) {
+    console.log('validaEnvio');
     const data = await executaScript({
       script: validaEnvioSBD,
       params: {
@@ -124,6 +133,7 @@ export default class Integracao {
         pMOD_ST_PKMEGA: pkMega,
       },
     });
+    console.log('validaEnvio data:', data);
 
     return data.length > 0;
   }
@@ -136,6 +146,7 @@ export default class Integracao {
     request?: string,
     response?: string
   ) {
+    console.log('gravaLogEnvio');
     const data = await executaScript({
       execSQL: true,
       script: gravaLogEnvioPRC,
@@ -148,6 +159,7 @@ export default class Integracao {
         pLOG_CL_RESPONSE: response || '',
       },
     });
+    console.log('gravaLogEnvio data:', data);
 
     return data;
   }

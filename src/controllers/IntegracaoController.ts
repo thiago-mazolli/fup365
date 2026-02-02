@@ -6,10 +6,14 @@ import AppError from '../helpers/AppError';
 
 export default class IntegracaoController {
   private static async integraDados(evento: 'I' | 'R' | 'C', registros: any[]) {
+    console.log('integraDados');
+    console.log('registros.length:', registros.length);
+    console.log('registros:', registros);
     for (let i = 0; i < registros.length; i++) {
       const { tblMega, pkMega, body } = registros[i];
 
       const canIntegrate = await Integracao.validaEnvio(tblMega, pkMega);
+      console.log('canIntegrate:', canIntegrate);
 
       if (canIntegrate) {
         try {
@@ -20,9 +24,13 @@ export default class IntegracaoController {
               ? '/api/postOrdersReceived'
               : '/api/postOrdersCanceled';
 
+          console.log('body:', body);
+
           const resp = await apiFup365.post(`${path}`, {
             ...body,
           });
+
+          console.log('resp:', resp);
 
           const { data, status, statusText } = resp;
 
