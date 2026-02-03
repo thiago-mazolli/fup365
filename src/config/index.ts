@@ -1,5 +1,5 @@
 export const porta = 44315;
-export const hostLocal = `http://localhost:${porta}`;
+export const hostLocal = `http://127.0.0.1:${porta}`;
 export const hostProduct = 'https://grupoolhodagua.fup365.com.br';
 export const login = 'api_fup365_grupoolhodagua';
 export const password = 'x2.6PqQ6pRYCf4s';
