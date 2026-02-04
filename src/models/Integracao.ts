@@ -22,12 +22,12 @@ export default class Integracao {
     console.log('buscaPedidos data:', data);
 
     return data.map((d: any) => ({
-      pkMega: d.tblMega,
-      tblMega: d.pkMega,
+      tblMega: d.tblMega,
+      pkMega: d.pkMega,
       dataModificacao: dateDBToDateJSON(d.dataModificacao),
       dataEnvio: dateDBToDateJSON(d.dataEnvio),
       body: {
-        formatdatetime: d.formatdatetime,
+        formatdatetime: 'Y-m-d H:i:s',
         pedidos: [
           {
             numero_pedido: d.numero_pedido,
@@ -75,7 +75,7 @@ export default class Integracao {
       dataModificacao: dateDBToDateJSON(d.dataModificacao),
       dataEnvio: dateDBToDateJSON(d.dataEnvio),
       body: {
-        formatdatetime: d.formatdatetime,
+        formatdatetime: 'Y-m-d H:i:s',
         pedidos: [
           {
             numero_pedido: d.numero_pedido,
@@ -103,7 +103,7 @@ export default class Integracao {
       dataModificacao: dateDBToDateJSON(d.dataModificacao),
       dataEnvio: dateDBToDateJSON(d.dataEnvio),
       body: {
-        formatdatetime: d.formatdatetime,
+        formatdatetime: 'Y-m-d H:i:s',
         pedidos: d.pedidos,
       },
     }));
@@ -125,7 +125,7 @@ export default class Integracao {
   }
 
   static async validaEnvio(tblMega: string, pkMega: string) {
-    console.log('validaEnvio');
+    console.log('validaEnvio tblMega|pkMega:', `${tblMega}|${pkMega}`);
     const data = await executaScript({
       script: validaEnvioSBD,
       params: {

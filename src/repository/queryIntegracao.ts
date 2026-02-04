@@ -49,11 +49,10 @@ select
   mod.MOD_ST_PKMEGA as "pkMega",
   mod.MOD_DT_DATAMOD as "dataModificacao",
   mod.MOD_DT_DATAENV as "dataEnvio",
-  to_char(sysdate, 'rrrr-mm-dd hh24:mi:ss') as "formatdatetime",
   --DADOS PEDIDO
   to_char(ped.PDC_IN_CODIGO) as "numero_pedido",
   null as "numero_legado",
-  ped.PDC_DT_EMISSAO as "data_emissao",
+  to_char(ped.PDC_DT_EMISSAO', rrrr-mm-dd hh24:mi:ss') as "data_emissao",
   pck_mega.f_retornacnpjcpf(ped.ORG_PAD_IN_CODIGO, ped.FIL_IN_CODIGO, 'S') as "cliente_cnpj",
   null as "cliente_centro",
   --DADOS FORNECEDOR
@@ -66,10 +65,10 @@ select
   agn.UF_ST_SIGLA as "fornecedor_uf",
   --DADOS CONTATO
   cursor (select
-            p.pag_st_nome as "fornecedor_contato",
-            p.pag_st_email as "fornecedor_email",
-            p.pag_st_celular as "fornecedor_celular",
-            p.pag_st_telcomercial as "fornecedor_telefone"
+            p.PAG_ST_NOME as "fornecedor_contato",
+            p.PAG_ST_EMAIL as "fornecedor_email",
+            p.PAG_ST_CELULAR as "fornecedor_celular",
+            p.PAG_ST_TELCOMERCIAL as "fornecedor_telefone"
           from
             GLO_PESSOA_AGENTES p
           where
@@ -82,7 +81,7 @@ select
   cursor (select
             itn.ITP_IN_SEQUENCIA as "numero_linha",
             0 as "numero_linha_legado",
-            pro.uni_st_unidade as "unidade",
+            pro.UNI_ST_UNIDADE as "unidade",
             itn.ITP_RE_VLUNITARIO as "valor",
             null as "moeda",
             ped.PDC_DT_EMISSAO as "requisicao_emissao",
@@ -107,8 +106,8 @@ select
             null as "deposito_endereco",
             null as "incoterm",
             cursor (select
-                      ent.itp_dt_entrega as "previsao_entrega",
-                      ent.itpp_re_quantidade as "quantidade",
+                      ent.ITP_DT_ENTREGA as "previsao_entrega",
+                      ent.ITPP_RE_QUANTIDADE as "quantidade",
                       0 as "prioridade"
                     from
                       EST_ITENSPEDPROGRAMADOS ent
@@ -183,10 +182,9 @@ select
   mod.MOD_ST_PKMEGA as "pkMega",
   mod.MOD_DT_DATAMOD as "dataModificacao",
   mod.MOD_DT_DATAENV as "dataEnvio",
-  to_char(sysdate, 'rrrr-mm-dd hh24:mi:ss') as "formatdatetime",
   --DADOS PEDIDO
   to_char(ped.PDC_IN_CODIGO) as "numero_pedido",
-  to_char(sysdate, 'dd/mm/rrrr hh24:mi:ss') as "cancelado_data"
+  to_char(sysdate, rrrr-mm-dd hh24:mi:ss') as "cancelado_data"
 from
   TJS_INTEGRACAOMOD mod
 inner join EST_PEDCOMPRAS ped on (
@@ -212,13 +210,12 @@ select
   mod.MOD_ST_TBLMEGA as "tblMega",
   mod.MOD_ST_PKMEGA as "pkMega",
   mod.MOD_DT_DATAMOD as "dataModificacao",
-  mod.MOD_DT_DATAENV as "dataEnvio"
-  to_char(sysdate, 'rrrr-mm-dd hh24:mi:ss') as "formatdatetime",
+  mod.MOD_DT_DATAENV as "dataEnvio",
   cursor (
     select
       to_char(itp.PDC_IN_CODIGO) as "numero_pedido",
       itp.ITP_IN_SEQUENCIA as "numero_linha",
-      rec.RCB_DT_DOCUMENTO as "recebimento_data",
+      to_char(rec.RCB_DT_DOCUMENTO, rrrr-mm-dd hh24:mi:ss') as "recebimento_data",
       rec.IPR_RE_QUANTIDADE as "recebimento_quantidade",
       rec.RCB_ST_NOTA as "recebimento_numero"
     from

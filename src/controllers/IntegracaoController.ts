@@ -3,15 +3,18 @@ import { Request, Response } from 'express';
 import apiFup365 from '../services/apiFup365';
 import Integracao from '../models/Integracao';
 import AppError from '../helpers/AppError';
+import safeStringify from '../helpers/safeStringify';
 
 export default class IntegracaoController {
   private static async integraDados(evento: 'I' | 'R' | 'C', registros: any[]) {
     console.log('integraDados');
     console.log('registros.length:', registros.length);
-    console.log('registros:', registros);
+
     for (let i = 0; i < registros.length; i++) {
       const { tblMega, pkMega, body } = registros[i];
 
+      console.log('tblMega:', tblMega);
+      console.log('pkMega:', pkMega);
       const canIntegrate = await Integracao.validaEnvio(tblMega, pkMega);
       console.log('canIntegrate:', canIntegrate);
 
@@ -24,7 +27,7 @@ export default class IntegracaoController {
               ? '/api/postOrdersReceived'
               : '/api/postOrdersCanceled';
 
-          console.log('body:', body);
+          console.log('body:', safeStringify(body));
 
           const resp = await apiFup365.post(`${path}`, {
             ...body,
@@ -42,8 +45,8 @@ export default class IntegracaoController {
               pkMega,
               'I',
               'Integração enviada com sucesso',
-              JSON.stringify(body || {}),
-              JSON.stringify(data || {})
+              safeStringify(body || {}),
+              safeStringify(data || {})
             );
           } else {
             await Integracao.gravaLogEnvio(
@@ -51,11 +54,25 @@ export default class IntegracaoController {
               pkMega,
               'E',
               `Erro: ${status} - ${statusText}`,
-              JSON.stringify(body || {}),
-              JSON.stringify(data || {})
+              safeStringify(body || {}),
+              safeStringify(data || {})
             );
           }
         } catch (error) {
+          console.log('integraDados catch error:', error);
+
+          await Integracao.gravaLogEnvio(
+            tblMega,
+            pkMega,
+            'E',
+            'Falha na comunicação',
+            safeStringify((error as any).config || {}),
+            safeStringify({
+              message: `${(error as any).code || ''} - ${(error as any)
+                .message || ''}`,
+            })
+          );
+
           if ((error as any).code === 'ERR_BAD_RESPONSE') {
             throw new AppError({
               statusCode: 500,
@@ -65,18 +82,6 @@ export default class IntegracaoController {
               },
             });
           }
-
-          await Integracao.gravaLogEnvio(
-            tblMega,
-            pkMega,
-            'E',
-            'Falha na comunicação',
-            JSON.stringify((error as any).config || {}),
-            JSON.stringify({
-              message: `${(error as any).code || ''} - ${(error as any)
-                .message || ''}`,
-            })
-          );
         }
       }
     }

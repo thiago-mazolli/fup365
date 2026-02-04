@@ -6,6 +6,7 @@ import {
 import executaScript from '../helpers/executaScript';
 import IAppError from '../interfaces/IAppError';
 import formataInteger from '../helpers/formataInteger';
+import safeStringify from '../helpers/safeStringify';
 
 export default class Logs {
   static async buscaLogsGenerico() {
@@ -61,7 +62,7 @@ export default class Logs {
         pLOG_CH_TYPE: 'E',
         pLOG_ST_MENSAGEM: err.error || null,
         pLOG_CL_SCRIPT: err.script || null,
-        pLOG_CL_PARAMS: err.params ? JSON.stringify(err.params) : null,
+        pLOG_CL_PARAMS: err.params ? safeStringify(err.params) : null,
         pLOG_CH_PERM_UPDATE: err.permUpdate || 'N',
         pLOG_IN_INT_SERVICO: formataInteger(err.intServico),
         pLOG_CH_INT_STATUS: err.intStatus || null,

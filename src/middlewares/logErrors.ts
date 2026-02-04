@@ -10,7 +10,7 @@ const logErrors = async (
 ) => {
   if (err instanceof AppError) {
     const { statusCode, header, message } = err;
-    console.log('Erro interno: ', err);
+    console.log('Erro interno:', err);
     return res
       .status(statusCode || 500)
       .send(formataErro(statusCode, header, message));
@@ -33,13 +33,13 @@ const logErrors = async (
       msgError.script = params;
     }
 
-    console.log('Erro em requisição interna: ', err.response.data);
+    console.log('Erro em requisição interna:', err.response.data);
     return res
       .status(status || 500)
       .send(formataErro(cod, header, msgError || message));
   }
 
-  console.log('Erro interno sem tratamento: ', err);
+  console.log('Erro interno sem tratamento:', err);
   return res
     .status(500)
     .send(formataErro(500, 'Erro Interno', 'Erro interno sem tratamento'));

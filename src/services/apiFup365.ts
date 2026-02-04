@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { hostProduct, login, password, authorization } from '../config';
 
-const baseURL = `${hostProduct}/api/authentication`;
+const baseURL = `${hostProduct}`;
 
 const authURL = `${baseURL}/api/authentication`;
 
@@ -14,6 +14,7 @@ apiFup365.interceptors.request.use(async config => {
   config.maxBodyLength = Infinity;
 
   try {
+    console.log('interceptors buscando token');
     const respToken = await axios.request({
       method: 'POST',
       url: authURL,
@@ -25,13 +26,12 @@ apiFup365.interceptors.request.use(async config => {
         login,
         password,
       },
-      auth: {
-        username: login,
-        password,
-      },
     });
+    console.log('respToken.data:', respToken.data);
 
-    const { token } = respToken.data;
+    const { data: token } = respToken.data;
+
+    console.log('token:', token);
 
     if (config.headers) {
       config.headers.Authorization = `Bearer ${token}`;

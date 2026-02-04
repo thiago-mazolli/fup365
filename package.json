@@ -4,8 +4,6 @@
   "main": "./src/server.ts",
   "author": "TJSys",
   "license": "MIT",
-  "description": "",
-  "private": true,
   "scripts": {
     "clear-dist": "if exist dist\\ rmdir /s /q .\\dist",
     "build": "yarn clear-dist && tsup ./src/server.ts && yarn --production",
@@ -13,7 +11,8 @@
     "start": "node ./dist/server.js",
     "deploy-start": "pm2 start ecosystem.config.js --env production",
     "deploy-stop": "pm2 delete ecosystem.config.js",
-    "package": "yarn build && xcopy \"./node_modules\" \"dist/node_modules\" /E /I /Y && npx pkg . && yarn"
+    "copy-ecosystem": "copy ecosystem.config.js build\\ /Y",
+    "package": "yarn build && xcopy \"./node_modules\" \"dist/node_modules\" /E /I /Y && npx pkg . && yarn copy-ecosystem && yarn"
   },
   "devDependencies": {
     "@types/cors": "^2.8.13",
