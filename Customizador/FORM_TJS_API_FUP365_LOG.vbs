@@ -1,6 +1,8 @@
 Dim Cl_Integracao, Ds_Integracao, Tv_Integracao
 Dim Cl_Log, Ds_Log, Tv_Log
 
+Dim Cl_Agentes, Ds_Agentes, Tv_Agentes
+
 Dim Cl_Reprocessar
 Dim vSQL, vSeleciona
 
@@ -57,8 +59,9 @@ Sub OnFormCreate
       SQL.Add("SELECT 'N' seleciona,")
       SQL.Add("       vw.*")
       SQL.Add("  FROM tjs_vw_integracao vw")
-      SQL.Add(" WHERE vw.pdc_in_codigo = decode(:pNROPEDIDO, '', vw.pdc_in_codigo, :pNROPEDIDO)")
-      SQL.Add("   AND trunc(vw.mod_dt_datamod) BETWEEN :pDATAINICIAL AND :pDATAFINAL")
+      SQL.Add(" WHERE ((vw.pdc_in_codigo = decode(:pNROPEDIDO, '', vw.pdc_in_codigo, :pNROPEDIDO)) OR")
+      SQL.Add(" WHERE  (vw.pdc_in_processo = decode(:pNROPEDIDO, '', vw.pdc_in_processo, :pNROPEDIDO)))")
+      SQL.Add("   AND trunc(vw.pdc_dt_emissao) BETWEEN :pDATAINICIAL AND :pDATAFINAL")
       SQL.Add("   AND vw.log_ch_status_atual = decode(:pSTATUS, 'T', vw.log_ch_status_atual, :pSTATUS)")
       SQL.Add("   AND vw.fil_in_codigo = decode(:pFILIAL, 'T', vw.fil_in_codigo, :pFILIAL)")
       SQL.Add(" ORDER BY vw.mod_dt_datamod ASC")
@@ -153,6 +156,55 @@ Sub OnFormCreate
       SQL.Add("                                   :pMENSAGEM);")
       SQL.Add("END;")
     End With
+
+    '//ABA AGENTES MONITORADOS - INÍCIO
+    '//DATASET DOS AGENTES
+    Cl_Agentes = New TMgClientDataSet(FormAtivo)
+    With Cl_Agentes
+      Name = "Cl_Agentes"
+      TableName = "TJS_AGENTE"
+      PkFields = "AGN_TAB_IN_CODIGO;AGN_PAD_IN_CODIGO;AGN_IN_CODIGO"
+      IndexFieldNames = PkFields
+      Close
+      SQL.Add("SELECT a.agn_tab_in_codigo,")
+      SQL.Add("       a.agn_pad_in_codigo,")
+      SQL.Add("       a.agn_in_codigo,")
+      SQL.Add("       agn.agn_st_nome,")
+      SQL.Add("       agn.agn_st_fantasia,")
+      SQL.Add("       decode(a.agn_ch_integrafup, 'S', 'Sim', 'N', 'Não') agn_st_integrafup")
+      SQL.Add("  FROM tjs_agente a")
+      SQL.Add("  JOIN glo_agentes agn ON agn.agn_tab_in_codigo = a.agn_tab_in_codigo")
+      SQL.Add("                      AND agn.agn_pad_in_codigo = a.agn_pad_in_codigo")
+      SQL.Add("                      AND agn.agn_in_codigo = a.agn_in_codigo")
+      SQL.Add(" ORDER BY a.agn_ch_integrafup DESC,")
+      SQL.Add("          agn.agn_st_nome ASC")
+      OnAfterOpen = AddressOf Cl_Agentes_OnAfterOpen()
+      Open
+    End With
+
+    '//DATASOURCE
+    Ds_Agentes = New TMgDataSource(FormAtivo)
+    With Ds_Agentes
+      Name = "Ds_Agentes"
+      DataSet = Cl_Agentes
+    End With
+
+    '//CxGrid - INTEGRAÇÕES
+    Tv_Agentes = Gd_Agentes.CreateView
+    Tv_Agentes.Name = "Tv_Agentes"
+    Gd_Agentes.Levels.Add
+    Gd_Agentes.Levels.Items[0].GridView = Tv_Agentes
+    Tv_Agentes.DataController.DataSource = Ds_Agentes
+    Tv_Agentes.DataController.DataModeController.GridMode = False
+    Tv_Agentes.OptionsView.GroupByBox = False        
+    Tv_Agentes.OptionsView.Indicator = True
+    Tv_Agentes.OptionsSelection.CellSelect = True
+    Tv_Agentes.OptionsSelection.HideSelection = True
+    Tv_Agentes.OptionsData.AppEnding = False
+    Tv_Agentes.OptionsData.Deleting = False
+    Tv_Agentes.OptionsData.Editing = False
+    Tv_Agentes.OptionsData.Inserting = False
+    '//ABA AGENTES MONITORADOS - FIM
 
   End With
 End Sub
@@ -322,6 +374,13 @@ Sub Cl_Integracao_OnAfterOpen(Sender As TMgClientDataSet)
     FieldByName("SELECIONA").Index = i
 
     i = i + 1
+    FieldByName("PDC_IN_PROCESSO").DisplayLabel = "Processo"
+    FieldByName("PDC_IN_PROCESSO").DisplayWidth = 8
+    FieldByName("PDC_IN_PROCESSO").Visible = True
+    FieldByName("PDC_IN_PROCESSO").Index = i
+    FieldByName("PDC_IN_PROCESSO").ReadOnly = True
+
+    i = i + 1
     FieldByName("PDC_IN_CODIGO").DisplayLabel = "Pedido"
     FieldByName("PDC_IN_CODIGO").DisplayWidth = 8
     FieldByName("PDC_IN_CODIGO").Visible = True
@@ -335,8 +394,14 @@ Sub Cl_Integracao_OnAfterOpen(Sender As TMgClientDataSet)
     FieldByName("SER_ST_CODIGO").Index = i
 
     i = i + 1
+    FieldByName("PDC_DT_EMISSAO").DisplayLabel = "Data Emissão"
+    FieldByName("PDC_DT_EMISSAO").DisplayWidth = 18
+    FieldByName("PDC_DT_EMISSAO").Visible = True
+    FieldByName("PDC_DT_EMISSAO").Index = i
+
+    i = i + 1
     FieldByName("AGN_IN_CODIGO").DisplayLabel = "Cód Agente"
-    FieldByName("AGN_IN_CODIGO").DisplayWidth = 10  
+    FieldByName("AGN_IN_CODIGO").DisplayWidth = 10
     FieldByName("AGN_IN_CODIGO").Visible = True
     FieldByName("AGN_IN_CODIGO").Index = i
 
@@ -351,6 +416,12 @@ Sub Cl_Integracao_OnAfterOpen(Sender As TMgClientDataSet)
     FieldByName("LOG_DT_STATUS_ATUAL").DisplayWidth = 18
     FieldByName("LOG_DT_STATUS_ATUAL").Visible = True
     FieldByName("LOG_DT_STATUS_ATUAL").Index = i
+
+    i = i + 1
+    FieldByName("MOD_ST_TIPOINTEGRACAO").DisplayLabel = "Tipo Integração"
+    FieldByName("MOD_ST_TIPOINTEGRACAO").DisplayWidth = 15
+    FieldByName("MOD_ST_TIPOINTEGRACAO").Visible = True
+    FieldByName("MOD_ST_TIPOINTEGRACAO").Index = i
 
     i = i + 1
     FieldByName("LOG_ST_STATUS_ATUAL").DisplayLabel = "Status"
@@ -430,6 +501,43 @@ Sub Cl_Log_OnAfterOpen(Sender As TMgClientDataSet)
 
     '//MONTA AS COLUNAS DO GRID
     Tv_Log.DataController.CreateAllItems(True)
+  End With
+End Sub
+
+Sub Cl_Agentes_OnAfterOpen(Sender As TMgClientDataSet)
+  Dim i As Integer
+
+  With Sender
+    For i = 0 To Fields.Count-1
+      Fields[i].Visible = False
+    Next
+
+    i = 0
+    FieldByName("AGN_IN_CODIGO").DisplayLabel = "Cód Agente"
+    FieldByName("AGN_IN_CODIGO").DisplayWidth = 10
+    FieldByName("AGN_IN_CODIGO").Visible = True
+    FieldByName("AGN_IN_CODIGO").Index = i
+
+    i = i + 1
+    FieldByName("AGN_ST_NOME").DisplayLabel = "Agente"
+    FieldByName("AGN_ST_NOME").DisplayWidth = 50
+    FieldByName("AGN_ST_NOME").Visible = True
+    FieldByName("AGN_ST_NOME").Index = i
+
+    i = i + 1
+    FieldByName("AGN_ST_FANTASIA").DisplayLabel = "Agente Fantasia"
+    FieldByName("AGN_ST_FANTASIA").DisplayWidth = 50
+    FieldByName("AGN_ST_FANTASIA").Visible = True
+    FieldByName("AGN_ST_FANTASIA").Index = i
+
+    i = i + 1
+    FieldByName("AGN_ST_INTEGRAFUP").DisplayLabel = "Integra FUP?"
+    FieldByName("AGN_ST_INTEGRAFUP").DisplayWidth = 12
+    FieldByName("AGN_ST_INTEGRAFUP").Visible = True
+    FieldByName("AGN_ST_INTEGRAFUP").Index = i
+
+    '//MONTA AS COLUNAS DO GRID
+    Tv_Agentes.DataController.CreateAllItems(True)
   End With
 End Sub
 

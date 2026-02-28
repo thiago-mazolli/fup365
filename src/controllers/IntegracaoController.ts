@@ -59,6 +59,8 @@ export default class IntegracaoController {
             );
           }
         } catch (error) {
+          const erro: any = error;
+
           console.log('integraDados catch error:', error);
 
           await Integracao.gravaLogEnvio(
@@ -66,10 +68,10 @@ export default class IntegracaoController {
             pkMega,
             'E',
             'Falha na comunicação',
-            safeStringify((error as any).config || {}),
+            safeStringify({ body, config: erro.config || {} }),
             safeStringify({
-              message: `${(error as any).code || ''} - ${(error as any)
-                .message || ''}`,
+              message: `${erro.code || ''} - ${erro.message || ''}`,
+              data: erro.response.data || '',
             })
           );
 

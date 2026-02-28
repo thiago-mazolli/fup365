@@ -43,14 +43,30 @@ export default class Integracao {
               fornecedor_bairro: d.fornecedor_bairro,
               fornecedor_cidade: d.fornecedor_cidade,
               fornecedor_uf: d.fornecedor_uf,
-              fornecedor_contato1: d.contatos[0].fornecedor_contato,
-              fornecedor_telefone1: d.contatos[0].fornecedor_telefone,
-              fornecedor_celular1: d.contatos[0].fornecedor_celular,
-              fornecedor_email1: d.contatos[0].fornecedor_email,
-              fornecedor_contato2: d.contatos[1].fornecedor_contato,
-              fornecedor_telefone2: d.contatos[1].fornecedor_telefone,
-              fornecedor_celular2: d.contatos[1].fornecedor_celular,
-              fornecedor_email2: d.contatos[1].fornecedor_email,
+              fornecedor_contato1: d.contatos[0]
+                ? d.contatos[0].fornecedor_contato
+                : null,
+              fornecedor_telefone1: d.contatos[0]
+                ? d.contatos[0].fornecedor_telefone
+                : null,
+              fornecedor_celular1: d.contatos[0]
+                ? d.contatos[0].fornecedor_celular
+                : null,
+              fornecedor_email1: d.contatos[0]
+                ? d.contatos[0].fornecedor_email
+                : null,
+              fornecedor_contato2: d.contatos[1]
+                ? d.contatos[1].fornecedor_contato
+                : null,
+              fornecedor_telefone2: d.contatos[1]
+                ? d.contatos[1].fornecedor_telefone
+                : null,
+              fornecedor_celular2: d.contatos[1]
+                ? d.contatos[1].fornecedor_celular
+                : null,
+              fornecedor_email2: d.contatos[1]
+                ? d.contatos[1].fornecedor_email
+                : null,
             },
             linhas: d.linhas,
           },
@@ -70,8 +86,8 @@ export default class Integracao {
     console.log('buscaPedidosCancelados data:', data);
 
     return data.map((d: any) => ({
-      tblMega: d.MOD_ST_TBLMEGA,
-      pkMega: d.MOD_ST_PKMEGA,
+      tblMega: d.tblMega,
+      pkMega: d.pkMega,
       dataModificacao: dateDBToDateJSON(d.dataModificacao),
       dataEnvio: dateDBToDateJSON(d.dataEnvio),
       body: {
@@ -79,7 +95,7 @@ export default class Integracao {
         pedidos: [
           {
             numero_pedido: d.numero_pedido,
-            numero_linha: 0,
+            numero_linha: 999999,
             cancelado_data: d.cancelado_data,
           },
         ],
