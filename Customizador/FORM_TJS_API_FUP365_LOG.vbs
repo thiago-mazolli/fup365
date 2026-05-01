@@ -26,6 +26,9 @@ Sub OnFormCreate
 
     Ed_NroPedido.OnKeyPress = AddressOf SomenteNumero()
 
+    Ed_DataInicial.Value = Date
+    Ed_DataFinal.Value = Date
+
     '//CARREGA O COMBO COM OS STATUS DOS LOGS
     vSQL = "SELECT 'P' log_ch_status," & _
            "       'Pendente' log_st_status" & _
@@ -56,15 +59,15 @@ Sub OnFormCreate
       PkFields = "MOD_ST_TBLMEGA;MOD_ST_PKMEGA"
       IndexFieldNames = PkFields
       Close
-      SQL.Add("SELECT 'N' seleciona,")
+      SQL.Clear
+      SQL.Add("SELECT /*+RULE*/'N' seleciona,")
       SQL.Add("       vw.*")
       SQL.Add("  FROM tjs_vw_integracao vw")
-      SQL.Add(" WHERE ((vw.pdc_in_codigo = decode(:pNROPEDIDO, '', vw.pdc_in_codigo, :pNROPEDIDO)) OR")
-      SQL.Add(" WHERE  (vw.pdc_in_processo = decode(:pNROPEDIDO, '', vw.pdc_in_processo, :pNROPEDIDO)))")
-      SQL.Add("   AND trunc(vw.pdc_dt_emissao) BETWEEN :pDATAINICIAL AND :pDATAFINAL")
+      SQL.Add(" WHERE vw.pdc_in_codigo = decode(:pNROPEDIDO, 0, vw.pdc_in_codigo, :pNROPEDIDO)")
+      SQL.Add("   AND vw.pdc_dt_emissao BETWEEN :pDATAINICIAL AND :pDATAFINAL")
       SQL.Add("   AND vw.log_ch_status_atual = decode(:pSTATUS, 'T', vw.log_ch_status_atual, :pSTATUS)")
-      SQL.Add("   AND vw.fil_in_codigo = decode(:pFILIAL, 'T', vw.fil_in_codigo, :pFILIAL)")
-      SQL.Add(" ORDER BY vw.mod_dt_datamod ASC")
+      SQL.Add("   AND vw.fil_in_codigo = decode(:pFILIAL, 0, vw.fil_in_codigo, :pFILIAL)")
+      SQL.Add(" ORDER BY vw.pdc_dt_emissao ASC")
       OnBeforeOpen = AddressOf Cl_Integracao_OnBeforeOpen()
       OnAfterOpen = AddressOf Cl_Integracao_OnAfterOpen()
     End With
@@ -101,6 +104,7 @@ Sub OnFormCreate
       PkFields = "LOG_DT_DATA;MOD_ST_TBLMEGA;MOD_ST_PKMEGA"
       '//IndexFieldNames = PkFields
       Close
+      SQl.Clear
       SQL.Add("SELECT l.*,")
       SQL.Add("       decode(l.log_ch_status, 'P', 'Pendente', 'E', 'Erro', 'I', 'Integrado') log_st_status")
       SQL.Add("  FROM tjs_integracaolog l")
@@ -159,6 +163,8 @@ Sub OnFormCreate
 
     '//ABA AGENTES MONITORADOS - INÍCIO
     '//DATASET DOS AGENTES
+    Ts_Agentes.OnShow = AddressOf Ts_Agentes_OnShow()
+
     Cl_Agentes = New TMgClientDataSet(FormAtivo)
     With Cl_Agentes
       Name = "Cl_Agentes"
@@ -166,6 +172,7 @@ Sub OnFormCreate
       PkFields = "AGN_TAB_IN_CODIGO;AGN_PAD_IN_CODIGO;AGN_IN_CODIGO"
       IndexFieldNames = PkFields
       Close
+      SQL.Clear
       SQL.Add("SELECT a.agn_tab_in_codigo,")
       SQL.Add("       a.agn_pad_in_codigo,")
       SQL.Add("       a.agn_in_codigo,")
@@ -179,7 +186,6 @@ Sub OnFormCreate
       SQL.Add(" ORDER BY a.agn_ch_integrafup DESC,")
       SQL.Add("          agn.agn_st_nome ASC")
       OnAfterOpen = AddressOf Cl_Agentes_OnAfterOpen()
-      Open
     End With
 
     '//DATASOURCE
@@ -196,7 +202,7 @@ Sub OnFormCreate
     Gd_Agentes.Levels.Items[0].GridView = Tv_Agentes
     Tv_Agentes.DataController.DataSource = Ds_Agentes
     Tv_Agentes.DataController.DataModeController.GridMode = False
-    Tv_Agentes.OptionsView.GroupByBox = False        
+    Tv_Agentes.OptionsView.GroupByBox = False
     Tv_Agentes.OptionsView.Indicator = True
     Tv_Agentes.OptionsSelection.CellSelect = True
     Tv_Agentes.OptionsSelection.HideSelection = True
@@ -336,19 +342,28 @@ End Sub
 Sub Cl_Integracao_OnBeforeOpen(Sender As TMgClientDataSet)
   With FormAtivo
     With Sender
-      ParamByName("pNROPEDIDO").Value = Ed_NroPedido.Text
+      If Ed_NroPedido.Text = "" Then
+        ParamByName("pNROPEDIDO").Value = 0
+      Else
+        ParamByName("pNROPEDIDO").Value = Ed_NroPedido.Text
+      End if
+
       ParamByName("pDATAINICIAL").Value = Ed_DataInicial.DateValue
       ParamByName("pDATAFINAL").Value = Ed_DataFinal.DateValue
       ParamByName("pSTATUS").Value = Cb_Status.Value
-      ParamByName("pFILIAL").Value = Cb_Filial.Value
 
-      /*
+      If Cb_Filial.Value = "T" Then
+        ParamByName("pFILIAL").Value = 0
+      Else
+        ParamByName("pFILIAL").Value = Cb_Filial.Value
+      End if
+
       Print(ParamByName("pNROPEDIDO").Value)
       Print(ParamByName("pDATAINICIAL").Value)
       Print(ParamByName("pDATAFINAL").Value)
       Print(ParamByName("pSTATUS").Value)
       Print(ParamByName("pFILIAL").Value)
-
+      /*
       ShowMessage(ParamByName("pNROPEDIDO").Value)
       ShowMessage(ParamByName("pDATAINICIAL").Value)
       ShowMessage(ParamByName("pDATAFINAL").Value)
@@ -395,7 +410,7 @@ Sub Cl_Integracao_OnAfterOpen(Sender As TMgClientDataSet)
 
     i = i + 1
     FieldByName("PDC_DT_EMISSAO").DisplayLabel = "Data Emissão"
-    FieldByName("PDC_DT_EMISSAO").DisplayWidth = 18
+    FieldByName("PDC_DT_EMISSAO").DisplayWidth = 12
     FieldByName("PDC_DT_EMISSAO").Visible = True
     FieldByName("PDC_DT_EMISSAO").Index = i
 
@@ -501,6 +516,13 @@ Sub Cl_Log_OnAfterOpen(Sender As TMgClientDataSet)
 
     '//MONTA AS COLUNAS DO GRID
     Tv_Log.DataController.CreateAllItems(True)
+  End With
+End Sub
+
+Sub Ts_Agentes_OnShow()
+  With FormAtivo
+    Cl_Agentes.Close
+    Cl_Agentes.Open
   End With
 End Sub
 

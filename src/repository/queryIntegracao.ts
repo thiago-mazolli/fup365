@@ -214,7 +214,7 @@ export const buscaRecebimentosSDB = `
     mod.MOD_DT_DATAENV as "dataEnvio",
     cursor (
       select
-        to_char(itp.PDC_IN_PROCESSO) as "numero_pedido",
+        to_char(ped.PDC_IN_PROCESSO) as "numero_pedido",
         itp.ITP_IN_SEQUENCIA as "numero_linha",
         to_char(rec.RCB_DT_DOCUMENTO, 'rrrr-mm-dd hh24:mi:ss') as "recebimento_data",
         rec.IPR_RE_QUANTIDADE as "recebimento_quantidade",
