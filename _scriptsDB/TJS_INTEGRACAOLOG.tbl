@@ -13,3 +13,8 @@ create table
 alter table TJS_INTEGRACAOLOG
 add constraint PK_TJS_INTEGRACAOLOG primary key (LOG_DT_DATA, MOD_ST_TBLMEGA, MOD_ST_PKMEGA)
 ;
+
+alter table TJS_INTEGRACAOLOG
+add constraint FK_TJS_INTEGRACAOLOG_TJS_INTEGRACAOMOD foreign key (MOD_ST_TBLMEGA, MOD_ST_PKMEGA)
+references TJS_INTEGRACAOMOD (MOD_ST_TBLMEGA, MOD_ST_PKMEGA) on delete cascade
+;

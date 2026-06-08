@@ -48,40 +48,56 @@ create or replace package body TJS_PCK_INTEGRACAO is
     result varchar2(300);
   begin
     begin
-      select (case
-               when pTIPO is null then
-                s.LOG_CH_STATUS
-               when pTIPO = 'M' then
-                cast(s.LOG_ST_MSG as varchar2(300))
-               when pTIPO = 'D' then
-                decode(s.LOG_CH_STATUS, 'P', 'Pendente', 'E', 'Erro', 'I', 'Integrado')
-               when pTIPO = 'T' then
-                to_char(s.LOG_DT_DATA, 'DD/MM/RRRR HH24:MI:SS')
+      select case
+               /* REGISTRO PENDENTE */
+               when m.MOD_DT_DATAMOD <> m.MOD_DT_DATAENV then
+                 case
+                   when pTIPO is null then 'P'
+                   when pTIPO = 'D' then 'Pendente'
+                   else null
+                 end
+               /* ÚLTIMO STATUS DO LOG */
                else
-                null
-             end) LOG_ST_STATUS
+                 case
+                   when pTIPO is null then l.LOG_CH_STATUS
+                   when pTIPO = 'D' then
+                     case l.LOG_CH_STATUS
+                       when 'P' then 'Pendente'
+                       when 'E' then 'Erro'
+                       when 'I' then 'Integrado'
+                     end
+                   when pTIPO = 'M' then
+                     cast(l.LOG_ST_MSG as varchar2(300))
+                   when pTIPO = 'T' then
+                     to_char(l.LOG_DT_DATA, 'DD/MM/RRRR HH24:MI:SS')
+                 end
+             end
         into result
-        from TJS_INTEGRACAOLOG s
-       where s.MOD_ST_TBLMEGA = pMOD_ST_TBLMEGA
-         and s.MOD_ST_PKMEGA = pMOD_ST_PKMEGA
-         and s.LOG_DT_DATA = (select max(l.LOG_DT_DATA)
-                                from TJS_INTEGRACAOLOG l
-                               where l.MOD_ST_TBLMEGA = s.MOD_ST_TBLMEGA
-                                 and l.MOD_ST_PKMEGA = s.MOD_ST_PKMEGA);
+        from TJS_INTEGRACAOMOD m
+        left join (select x.MOD_ST_TBLMEGA,
+                          x.MOD_ST_PKMEGA,
+                          x.LOG_CH_STATUS,
+                          x.LOG_ST_MSG,
+                          x.LOG_DT_DATA
+                     from (select g.*,
+                                  row_number() over (
+                                    partition by g.MOD_ST_TBLMEGA, g.MOD_ST_PKMEGA
+                                    order by g.LOG_DT_DATA desc
+                                  ) rn
+                             from TJS_INTEGRACAOLOG g) x
+                    where x.rn = 1) l on l.MOD_ST_TBLMEGA = m.MOD_ST_TBLMEGA
+                                     and l.MOD_ST_PKMEGA  = m.MOD_ST_PKMEGA
+       where m.MOD_ST_TBLMEGA = pMOD_ST_TBLMEGA
+         and m.MOD_ST_PKMEGA  = pMOD_ST_PKMEGA;
     exception
       when no_data_found then
-        result := (case
-                    when pTIPO is null then
-                     'P'
-                    when pTIPO = 'M' then
-                     null
-                    when pTIPO = 'D' then
-                     'Pendente'
-                    else
-                     null
-                  end);
+        result := case
+                    when pTIPO is null then 'P'
+                    when pTIPO = 'D' then 'Pendente'
+                    else null
+                  end;
       when others then
-        result := null;
+        result := 'Others';
     end;
   
     return result;
