@@ -50,7 +50,7 @@ create or replace package body TJS_PCK_INTEGRACAO is
     begin
       select case
                /* REGISTRO PENDENTE */
-               when m.MOD_DT_DATAMOD <> m.MOD_DT_DATAENV then
+               when nvl(m.MOD_DT_DATAMOD, sysdate) > nvl(m.MOD_DT_DATAENV, sysdate) then
                  case
                    when pTIPO is null then 'P'
                    when pTIPO = 'D' then 'Pendente'

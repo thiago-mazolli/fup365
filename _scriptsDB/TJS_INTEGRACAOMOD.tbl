@@ -10,3 +10,11 @@ create table
 alter table TJS_INTEGRACAOMOD
 add constraint PK_TJS_INTEGRACAOMOD primary key (MOD_ST_TBLMEGA, MOD_ST_PKMEGA)
 ;
+
+alter table TJS_INTEGRACAOMOD
+add constraint IDX_TJS_INTEGRACAOMOD_MOD_ST_PKMEGA primary key (MOD_ST_PKMEGA)
+;
+
+alter table TJS_INTEGRACAOMOD
+add constraint IDX_TJS_INTEGRACAOMOD_MOD_ST_TBLMEGA primary key (MOD_ST_TBLMEGA)
+;

@@ -203,6 +203,11 @@ export const buscaPedidosCanceladosSDB = `
     and mod.MOD_ST_TBLMEGA = 'EST_PEDCOMPRAS_CANC'
     and nvl(mod.MOD_DT_DATAMOD, sysdate) < (sysdate - INTERVAL '2' MINUTE)
     and nvl(tjs_pck_integracao.f_status_integracao(mod.MOD_ST_TBLMEGA, mod.MOD_ST_PKMEGA), 'P') = 'P'
+    and exists (select 1
+                  from TJS_INTEGRACAOLOG log
+                 where log.MOD_ST_PKMEGA = mod.MOD_ST_PKMEGA
+                   and log.MOD_ST_TBLMEGA = 'EST_PEDCOMPRAS'
+                   and log.LOG_CH_STATUS = 'I')
   order by mod.MOD_DT_DATAMOD asc
 `;
 
@@ -216,7 +221,7 @@ export const buscaRecebimentosSDB = `
       select
         to_char(ped.PDC_IN_PROCESSO) as "numero_pedido",
         itp.ITP_IN_SEQUENCIA as "numero_linha",
-        to_char(rec.RCB_DT_DOCUMENTO, 'rrrr-mm-dd hh24:mi:ss') as "recebimento_data",
+        to_char(rcb.RCB_DT_MOVIMENTO, 'rrrr-mm-dd hh24:mi:ss') as "recebimento_data",
         rec.IPR_RE_QUANTIDADE as "recebimento_quantidade",
         rec.RCB_ST_NOTA as "recebimento_numero"
       from
@@ -230,6 +235,18 @@ export const buscaRecebimentosSDB = `
           and rec.SER_IN_SEQUENCIA = itp.SER_IN_SEQUENCIA
           and rec.PDC_IN_CODIGO = itp.PDC_IN_CODIGO
           and rec.ITP_IN_SEQUENCIA = itp.ITP_IN_SEQUENCIA
+        )
+        inner join EST_RECEBIMENTO rcb on (
+          rcb.ORG_TAB_IN_CODIGO = rec.ORG_TAB_IN_CODIGO
+          and rcb.ORG_PAD_IN_CODIGO = rec.ORG_PAD_IN_CODIGO
+          and rcb.ORG_IN_CODIGO = itp.ORG_IN_CODIGO
+          and rcb.ORG_TAU_ST_CODIGO = rec.ORG_TAU_ST_CODIGO
+          and rcb.AGN_TAB_IN_CODIGO = rec.AGN_TAB_IN_CODIGO
+          and rcb.AGN_PAD_IN_CODIGO = rec.AGN_PAD_IN_CODIGO
+          and rcb.AGN_IN_CODIGO = rec.AGN_IN_CODIGO
+          and RCB.AGN_TAU_ST_CODIGO = REC.AGN_TAU_ST_CODIGO
+          AND RCB.RCB_ST_NOTA = REC.RCB_ST_NOTA
+          AND RCB.RCB_DT_DOCUMENTO = REC.RCB_DT_DOCUMENTO
         )
       where
         itp.ORG_TAB_IN_CODIGO = ped.ORG_TAB_IN_CODIGO
@@ -258,5 +275,10 @@ export const buscaRecebimentosSDB = `
     and mod.MOD_ST_TBLMEGA = 'EST_PEDIDOSRECEB'
     and nvl(mod.MOD_DT_DATAMOD, sysdate) < (sysdate - INTERVAL '2' MINUTE)
     and nvl(tjs_pck_integracao.f_status_integracao(mod.MOD_ST_TBLMEGA, mod.MOD_ST_PKMEGA), 'P') = 'P'
+    and exists (select 1
+                  from TJS_INTEGRACAOLOG log
+                 where log.MOD_ST_PKMEGA = mod.MOD_ST_PKMEGA
+                   and log.MOD_ST_TBLMEGA = 'EST_PEDCOMPRAS'
+                   and log.LOG_CH_STATUS = 'I')
   order by mod.MOD_DT_DATAMOD asc
 `;

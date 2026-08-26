@@ -14,7 +14,7 @@ apiFup365.interceptors.request.use(async config => {
   config.maxBodyLength = Infinity;
 
   try {
-    console.log('interceptors buscando token');
+    // console.log('interceptors buscando token');
     const respToken = await axios.request({
       method: 'POST',
       url: authURL,
@@ -27,17 +27,17 @@ apiFup365.interceptors.request.use(async config => {
         password,
       },
     });
-    console.log('respToken.data:', respToken.data);
+    // console.log('respToken.data:', respToken.data);
 
     const { data: token } = respToken.data;
 
-    console.log('token:', token);
+    // console.log('token:', token);
 
     if (config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
   } catch (error) {
-    console.log('getToken error', error);
+    // console.log('getToken error', error);
 
     throw new Error(
       `Erro ao requisitar o token. ${(error as any).response.status} - ${

@@ -19,7 +19,7 @@ export default class Integracao {
         // pMOD_ST_TBLMEGA: tblMega,
       },
     });
-    console.log('buscaPedidos data:', data);
+    // console.log('buscaPedidos data:', data);
 
     return data.map((d: any) => ({
       tblMega: d.tblMega,
@@ -83,7 +83,7 @@ export default class Integracao {
         // pMOD_ST_TBLMEGA: tblMega,
       },
     });
-    console.log('buscaPedidosCancelados data:', data);
+    // console.log('buscaPedidosCancelados data:', data);
 
     return data.map((d: any) => ({
       tblMega: d.tblMega,
@@ -111,7 +111,7 @@ export default class Integracao {
         // pMOD_ST_TBLMEGA: tblMega,
       },
     });
-    console.log('buscaRecebimentos data:', data);
+    // console.log('buscaRecebimentos data:', data);
 
     return data.map((d: any) => ({
       tblMega: d.tblMega,
@@ -135,7 +135,7 @@ export default class Integracao {
         pMOD_ST_PKMEGA: pkMega,
       },
     });
-    console.log('updateDataEnvio data:', data);
+    // console.log('updateDataEnvio data:', data);
 
     return data;
   }
@@ -149,7 +149,7 @@ export default class Integracao {
         pMOD_ST_PKMEGA: pkMega,
       },
     });
-    console.log('validaEnvio data:', data);
+    // console.log('validaEnvio data:', data);
 
     return data.length > 0;
   }
@@ -175,7 +175,7 @@ export default class Integracao {
         pLOG_CL_RESPONSE: response || '',
       },
     });
-    console.log('gravaLogEnvio data:', data);
+    // console.log('gravaLogEnvio data:', data);
 
     return data;
   }

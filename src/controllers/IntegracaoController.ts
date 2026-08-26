@@ -7,14 +7,14 @@ import safeStringify from '../helpers/safeStringify';
 
 export default class IntegracaoController {
   private static async integraDados(evento: 'I' | 'R' | 'C', registros: any[]) {
-    console.log('integraDados');
-    console.log('registros.length:', registros.length);
+    console.log(
+      `integraDados evento: ${evento} registros.length:  ${registros.length}`
+    );
 
     for (let i = 0; i < registros.length; i++) {
       const { tblMega, pkMega, body } = registros[i];
 
-      console.log('tblMega:', tblMega);
-      console.log('pkMega:', pkMega);
+      console.log(`tblMega: ${tblMega} pkMega: ${pkMega}`);
       const canIntegrate = await Integracao.validaEnvio(tblMega, pkMega);
       console.log('canIntegrate:', canIntegrate);
 
@@ -27,19 +27,19 @@ export default class IntegracaoController {
               ? '/api/postOrdersReceived'
               : '/api/postOrdersCanceled';
 
-          console.log('body:', safeStringify(body));
+          // console.log('body:', safeStringify(body));
 
           const resp = await apiFup365.post(`${path}`, {
             ...body,
           });
 
-          console.log('resp:', resp);
+          // console.log('resp:', resp);
 
           const { data, status, statusText } = resp;
 
-          if (data.status.toUpperCase() === 'SUCCESS') {
-            await Integracao.updateDataEnvio(tblMega, pkMega);
+          await Integracao.updateDataEnvio(tblMega, pkMega);
 
+          if (data.status.toUpperCase() === 'SUCCESS') {
             await Integracao.gravaLogEnvio(
               tblMega,
               pkMega,
@@ -63,6 +63,8 @@ export default class IntegracaoController {
 
           console.log('integraDados catch error:', error);
 
+          await Integracao.updateDataEnvio(tblMega, pkMega);
+
           await Integracao.gravaLogEnvio(
             tblMega,
             pkMega,
@@ -75,15 +77,15 @@ export default class IntegracaoController {
             })
           );
 
-          if ((error as any).code === 'ERR_BAD_RESPONSE') {
-            throw new AppError({
-              statusCode: 500,
-              header: 'Erro de Comunicação',
-              error: {
-                message: 'A API de Comunicação não esta respondendo',
-              },
-            });
-          }
+          // if ((error as any).code === 'ERR_BAD_RESPONSE') {
+          //   throw new AppError({
+          //     statusCode: 500,
+          //     header: 'Erro de Comunicação',
+          //     error: {
+          //       message: 'A API de Comunicação não esta respondendo',
+          //     },
+          //   });
+          // }
         }
       }
     }
